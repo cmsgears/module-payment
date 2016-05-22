@@ -1,0 +1,20 @@
+{
+	"name": "cmsgears/module-payment",
+	"description": "The Payment Module for CMSGears based projects. It's required for all the projects dealing with payments.",
+	"homepage": "http://www.cmsgears.com",
+	"type": "package",
+	"keywords": [ "yii2", "cmsgears", "module", "payment" ],
+	"license": "GPLv3",
+	"support": {
+		"resources": "http://www.cmsgears.org"
+	},
+	"autoload": {
+		"psr-4": {
+			"cmsgears\\payment\\": ""
+		}
+	},
+    "require": {
+        "php": ">=5.4.0",
+        "cmsgears/module-core": "*"
+    }
+}
