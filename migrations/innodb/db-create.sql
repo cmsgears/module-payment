@@ -15,7 +15,7 @@ CREATE TABLE `cmg_payment` (
   `modifiedBy` bigint(20) DEFAULT NULL,   
   `description` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `mode` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `mode` varchar(255) DEFAULT NULL,
   `amount` float(8,2) NOT NULL DEFAULT '0',
   `createdAt` datetime NOT NULL,
   `modifiedAt` datetime DEFAULT NULL,
