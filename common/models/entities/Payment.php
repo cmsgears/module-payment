@@ -14,6 +14,8 @@ use cmsgears\payment\common\models\entities\PaymentTables;
 
 use cmsgears\core\common\models\base\CmgEntity;
 
+use cmsgears\core\common\models\traits\DataTrait;
+
 /**
  * Payment Entity - The primary class.
  *
@@ -49,6 +51,8 @@ class Payment extends CmgEntity {
     // Private/Protected --
 
     // Traits ------------------------------------------------------
+
+    use DataTrait;
 
     // Constructor and Initialisation ------------------------------
 

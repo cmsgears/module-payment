@@ -36,7 +36,7 @@ class PaymentService extends \cmsgears\core\common\services\base\Service {
 	public static function create( $parentId, $parentType, $type, $mode, $amount, $message, $data = null ) {
 
 		// Set Attributes
-		$user				    = Yii::$app->user->getIdentity();
+		$user				    = Yii::$app->cmgCore->getAppUser();
 
 		$payment				= new Payment();
         $payment->parentId      = $parentId;
@@ -55,6 +55,14 @@ class PaymentService extends \cmsgears\core\common\services\base\Service {
 	}
 
 	// Update -----------
+
+	public static function updateData( $payment, $paymentId, $token, $payerId ) {
+
+        $payment->setDataAttribute( 'paymentId', $paymentId );
+        $payment->setDataAttribute( 'token', $token );
+        $payment->setDataAttribute( 'payerId', $payerId );
+        $payment->update();
+	}
 
 }
 
