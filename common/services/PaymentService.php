@@ -56,13 +56,11 @@ class PaymentService extends \cmsgears\core\common\services\base\Service {
 
 	// Update -----------
 
-	public static function updateData( $payment, $paymentId, $token, $payerId ) {
+    public static function updatePaymentType( $payment, $type ) {
 
-        $payment->setDataAttribute( 'paymentId', $paymentId );
-        $payment->setDataAttribute( 'token', $token );
-        $payment->setDataAttribute( 'payerId', $payerId );
+        $payment->type  = $type;
         $payment->update();
-	}
+    }
 
 }
 
