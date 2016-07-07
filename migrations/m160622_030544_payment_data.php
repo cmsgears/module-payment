@@ -19,6 +19,8 @@ class m160622_030544_payment_data extends \yii\db\Migration {
 
 		$this->site		= Site::findBySlug( CoreGlobal::SITE_MAIN );
 		$this->master	= User::findByUsername( 'demomaster' );
+
+		Yii::$app->core->setSite( $this->site );
 	}
 
     public function up() {
