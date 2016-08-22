@@ -1,5 +1,5 @@
 <?php
-namespace cmsgears\payment\common\services;
+namespace cmsgears\payment\common\services\entities;
 
 // Yii Imports
 use \Yii;
@@ -9,7 +9,9 @@ use cmsgears\core\common\config\CoreGlobal;
 
 use cmsgears\payment\common\models\entities\Payment;
 
-class PaymentService extends \cmsgears\core\common\services\base\Service {
+use cmsgears\payment\common\services\interfaces\entities\ITransactionService;
+
+class PaymentService extends \cmsgears\core\common\services\base\Service implements ITransactionService {
 
 	// Static Methods ----------------------------------------------
 
@@ -63,5 +65,3 @@ class PaymentService extends \cmsgears\core\common\services\base\Service {
     }
 
 }
-
-?>
