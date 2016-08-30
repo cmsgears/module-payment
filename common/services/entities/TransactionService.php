@@ -7,11 +7,20 @@ use \Yii;
 // CMG Imports
 use cmsgears\core\common\config\CoreGlobal;
 
-use cmsgears\payment\common\models\entities\Payment;
+use cmsgears\payment\common\models\base\PaymentTables;
+use cmsgears\payment\common\models\entities\Transaction;
 
 use cmsgears\payment\common\services\interfaces\entities\ITransactionService;
 
-class PaymentService extends \cmsgears\core\common\services\base\Service implements ITransactionService {
+class TransactionService extends \cmsgears\core\common\services\base\EntityService implements ITransactionService {
+
+	// Variables ---------------------------------------------------
+
+	// Globals -------------------------------
+
+	// Constants --------------
+
+	// Public -----------------
 
 	// Static Methods ----------------------------------------------
 
@@ -19,7 +28,7 @@ class PaymentService extends \cmsgears\core\common\services\base\Service impleme
 
 	public static function findById( $id ) {
 
-		return Payment::findById( $id );
+		return $modelClass::findById( $id );
 	}
 
 	// Data Provider ------
@@ -35,33 +44,36 @@ class PaymentService extends \cmsgears\core\common\services\base\Service impleme
 
 	// Create -----------
 
-	public static function create( $parentId, $parentType, $type, $mode, $amount, $message, $data = null ) {
+	public function createTransaction( $config = [] ) {
 
-		// Set Attributes
-		$user				    = Yii::$app->cmgCore->getAppUser();
+		$user			= Yii::$app->core->getAppUser();
+		$data			= isset( $config[ 'data' ] ) ? $config[ 'data' ] : null;
+		$processedAt	= isset( $config[ 'processedAt' ] ) ? $config[ 'processedAt' ] : null;
 
-		$payment				= new Payment();
-        $payment->parentId      = $parentId;
-        $payment->parentType    = $parentType;
-		$payment->createdBy		= $user->id;
-		$payment->type			= $type;
-		$payment->mode			= $mode;
-		$payment->amount		= $amount;
-		$payment->description	= $message;
-        $payment->data          = $data;
+		$transaction				= new Transaction();
+        $transaction->parentId      = $config[ 'parentId' ];
+        $transaction->parentType    = $config[ 'parentType' ];
+		$transaction->createdBy		= $user->id;
+		$transaction->type			= $config[ 'type' ];
+		$transaction->mode			= $config[ 'mode' ];
+		$transaction->amount		= $config[ 'amount' ];
+		$transaction->description	= $config[ 'description' ];
+		$transaction->currency		= $config[ 'currency' ];
+		$transaction->processedAt	= $processedAt;
+        $transaction->data          = $data;
 
-		$payment->save();
+		$transaction->save();
 
-		// Return Payment
-		return $payment;
+		// Return Transaction
+		return $transaction;
 	}
 
 	// Update -----------
 
-    public static function updatePaymentType( $payment, $type ) {
+    public static function updateTransactionType( $transaction, $type ) {
 
-        $payment->type  = $type;
-        $payment->update();
+        $transaction->type  = $type;
+        $transaction->update();
     }
 
 }

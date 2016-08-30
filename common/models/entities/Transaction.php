@@ -9,10 +9,11 @@ use yii\behaviors\TimestampBehavior;
 
 // CMG Imports
 use cmsgears\core\common\config\CoreGlobal;
+use cmsgears\cart\common\config\CartGlobal;
 
 use cmsgears\payment\common\models\base\PaymentTables;
 
-use cmsgears\core\common\models\traits\DataTrait;
+use cmsgears\core\common\models\traits\resources\DataTrait;
 use cmsgears\core\common\models\traits\ResourceTrait;
 
 /**
@@ -35,6 +36,7 @@ use cmsgears\core\common\models\traits\ResourceTrait;
  * @property datetime $modifiedAt
  * @property string $content
  * @property string $data
+ * @property date $processedAt
  */
 class Transaction extends \cmsgears\core\common\models\base\Entity {
 
@@ -50,12 +52,26 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
     const MODE_DEBIT_C      = 'd-card';		// Specific for Debit Cards
     const MODE_CREDIT_C     = 'c-card';		// Specific for Credit Cards
 
+	// Transaction Type
+    const TYPE_CREDIT		= 'credit';
+	const TYPE_DEBIG		= 'debit';
+
 	// Special offline
     const MODE_CHEQUE       = 'cheque';
     const MODE_DRAFT        = 'draft';
 
 	// Direct Transfers
     const MODE_WIRE         = 'wire';
+
+	public static $modeList = [
+
+		self::MODE_OFFLINE => 'Offline',
+		self::MODE_CARD => 'Card',
+		self::MODE_DEBIT_C => 'Debit Card',
+		self::MODE_CREDIT_C => 'Credit Card',
+		self::MODE_CHEQUE => 'Cheque',
+		self::MODE_DRAFT => 'Draft'
+	];
 
 	// Public -----------------
 
@@ -115,7 +131,8 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
             [ [ 'description' ], 'string', 'min' => 0, 'max' => Yii::$app->core->xLargeText ],
             [ [ 'amount' ], 'number', 'min' => 0 ],
             [ [ 'createdBy', 'modifiedBy', 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ],
-        	[ [ 'createdAt', 'updatedAt' ], 'date', 'format' => Yii::$app->formatter->datetimeFormat ]
+            [ [ 'processedAt' ], 'date', 'format' => Yii::$app->formatter->dateFormat ],
+        	[ [ 'createdAt', 'modifiedAt' ], 'date', 'format' => Yii::$app->formatter->datetimeFormat ]
         ];
 
         if ( Yii::$app->core->trimFieldValue ) {
@@ -157,7 +174,7 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
      */
     public static function tableName() {
 
-        return PaymentTables::TABLE_PAYMENT;
+        return PaymentTables::TABLE_TRANSACTION;
     }
 
 	// CMG parent classes --------------------

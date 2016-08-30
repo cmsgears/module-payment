@@ -21,6 +21,8 @@ interface ITransactionService extends \cmsgears\core\common\services\interfaces\
 
 	// Create -------------
 
+	public function createTransaction( $config = [] );
+
 	// Update -------------
 
 	// Delete -------------

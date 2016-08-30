@@ -59,7 +59,8 @@ class m160622_030538_payment extends \yii\db\Migration {
 			'createdAt' => $this->dateTime()->notNull(),
 			'modifiedAt' => $this->dateTime(),
 			'content' => $this->text(),
-			'data' => $this->text()
+			'data' => $this->text(),
+			'processedAt' => $this->date()->defaultValue( null )
         ], $this->options );
 
         // Index for columns site, creator and modifier
