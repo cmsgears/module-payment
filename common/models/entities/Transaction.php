@@ -190,6 +190,11 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 		return self::find()->where( 'code=:code AND service=:service', [ ':code' => $code, ':service' => $service ] )->one();
 	}
 
+	public static function queryByPayment() {
+
+		return self::find();
+	}
+
 	// Create -----------------
 
 	// Update -----------------

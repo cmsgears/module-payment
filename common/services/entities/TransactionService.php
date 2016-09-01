@@ -22,13 +22,44 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 	// Public -----------------
 
+	public static $modelClass	= '\cmsgears\payment\common\models\entities\Transaction';
+
 	// Static Methods ----------------------------------------------
 
 	// Read ----------------
 
 	public static function findById( $id ) {
 
+		$modelClass	= self::$modelClass;
+
 		return $modelClass::findById( $id );
+	}
+
+	public function getPayments( $user = false ) {
+
+		$modelClass	= self::$modelClass;
+
+		$payments	= $modelClass::queryByPayment();
+
+		if( $user ) {
+
+			$user	= Yii::$app->user->getIdentity();
+
+			return $payments->where( 'createdBy=:creator', [ ':creator' => $user->id ] )->orderBy( 'createdAt DESC' )->all();
+		}
+
+		return $payments->orderBy( 'createdAt DESC' )->all();
+	}
+
+	public function getDatePayments() {
+
+		$modelClass	= self::$modelClass;
+
+		$payments	= $modelClass::queryByPayment();
+
+		$payments	= $payments->groupBy( 'processedAt' )->all();
+
+		return $payments;
 	}
 
 	// Data Provider ------

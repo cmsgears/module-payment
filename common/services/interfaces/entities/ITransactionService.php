@@ -15,6 +15,10 @@ interface ITransactionService extends \cmsgears\core\common\services\interfaces\
 
     // Read - Models ---
 
+    public function getPayments( $user = false );
+
+	public function getDatePayments();
+
     // Read - Lists ----
 
     // Read - Maps -----
