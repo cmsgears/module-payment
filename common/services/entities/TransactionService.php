@@ -3,6 +3,7 @@ namespace cmsgears\payment\common\services\entities;
 
 // Yii Imports
 use \Yii;
+use yii\db\Query;
 
 // CMG Imports
 use cmsgears\core\common\config\CoreGlobal;
@@ -53,6 +54,14 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 	public function getDatePayments() {
 
+		$query	= new Query();
+
+		$query->select( 'DATE_FORMAT(createdAt, "%m-%Y")' )
+		->from( PaymentTables::TABLE_TRANSACTION );
+
+
+		$query	= $query->createCommand();
+
 		$modelClass	= self::$modelClass;
 
 		$payments	= $modelClass::queryByPayment();
@@ -80,11 +89,12 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 		$user			= Yii::$app->core->getAppUser();
 		$data			= isset( $config[ 'data' ] ) ? $config[ 'data' ] : null;
 		$processedAt	= isset( $config[ 'processedAt' ] ) ? $config[ 'processedAt' ] : null;
+		$creator		= isset( $config[ 'createdBy' ] ) ? $config[ 'createdBy' ] : $user->id;
 
 		$transaction				= new Transaction();
         $transaction->parentId      = $config[ 'parentId' ];
         $transaction->parentType    = $config[ 'parentType' ];
-		$transaction->createdBy		= $user->id;
+		$transaction->createdBy		= $creator;
 		$transaction->type			= $config[ 'type' ];
 		$transaction->mode			= $config[ 'mode' ];
 		$transaction->amount		= $config[ 'amount' ];
