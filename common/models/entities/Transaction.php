@@ -47,6 +47,7 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 	// Constants --------------
 
     const MODE_OFFLINE		= 'offline';	// Direct - In hand
+    const MODE_FREE			= 'free';		// Free
 
     const MODE_CARD         = 'card';		// Any card
     const MODE_DEBIT_C      = 'd-card';		// Specific for Debit Cards

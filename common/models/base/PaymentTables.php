@@ -5,7 +5,7 @@ class PaymentTables {
 
 	// Entities -------------
 
-	const TABLE_TRANSACTION			= 'cmg_payment';
+	const TABLE_TRANSACTION			= 'cmg_transaction';
 
 	// Resources ------------
 
