@@ -46,23 +46,23 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 
 	// Constants --------------
 
-    const MODE_OFFLINE		= 'offline';	// Direct - In hand
-    const MODE_FREE			= 'free';		// Free
+	const MODE_OFFLINE		= 'offline';	// Direct - In hand
+	const MODE_FREE 		= 'free'; // Free
 
-    const MODE_CARD         = 'card';		// Any card
-    const MODE_DEBIT_C      = 'd-card';		// Specific for Debit Cards
-    const MODE_CREDIT_C     = 'c-card';		// Specific for Credit Cards
+	const MODE_CARD			= 'card';		// Any card
+	const MODE_DEBIT_C		= 'd-card';		// Specific for Debit Cards
+	const MODE_CREDIT_C		= 'c-card';		// Specific for Credit Cards
 
 	// Transaction Type
-    const TYPE_CREDIT		= 'credit';
+	const TYPE_CREDIT		= 'credit';
 	const TYPE_DEBIG		= 'debit';
 
 	// Special offline
-    const MODE_CHEQUE       = 'cheque';
-    const MODE_DRAFT        = 'draft';
+	const MODE_CHEQUE		= 'cheque';
+	const MODE_DRAFT		= 'draft';
 
 	// Direct Transfers
-    const MODE_WIRE         = 'wire';
+	const MODE_WIRE			= 'wire';
 
 	public static $modeList = [
 
@@ -101,60 +101,60 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 
 	// yii\base\Component -----
 
-    /**
-     * @inheritdoc
-     */
-    public function behaviors() {
+	/**
+	 * @inheritdoc
+	 */
+	public function behaviors() {
 
-        return [
-            'timestampBehavior' => [
-                'class' => TimestampBehavior::className(),
-                'createdAtAttribute' => 'createdAt',
-                'updatedAtAttribute' => 'modifiedAt',
-                'value' => new Expression('NOW()')
-            ]
-        ];
-    }
+		return [
+			'timestampBehavior' => [
+				'class' => TimestampBehavior::className(),
+				'createdAtAttribute' => 'createdAt',
+				'updatedAtAttribute' => 'modifiedAt',
+				'value' => new Expression('NOW()')
+			]
+		];
+	}
 
 	// yii\base\Model ---------
 
-    /**
-     * @inheritdoc
-     */
-    public function rules() {
+	/**
+	 * @inheritdoc
+	 */
+	public function rules() {
 
-        $rules = [
-        	[ [ 'parentId', 'parentType', 'type' ], 'required' ],
-        	[ [ 'id', 'content', 'data' ], 'safe' ],
-        	[ 'currency', 'string', 'min' => 1, 'max' => Yii::$app->core->smallText ],
-            [ [ 'parentType', 'type', 'mode', 'code', 'service' ], 'string', 'min' => 1, 'max' => Yii::$app->core->mediumText ],
-            [ [ 'title' ], 'string', 'min' => 1, 'max' => Yii::$app->core->largeText ],
-            [ [ 'description' ], 'string', 'min' => 0, 'max' => Yii::$app->core->xLargeText ],
-            [ [ 'amount' ], 'number', 'min' => 0 ],
-            [ [ 'createdBy', 'modifiedBy', 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ],
-            [ [ 'processedAt' ], 'date', 'format' => Yii::$app->formatter->dateFormat ],
-        	[ [ 'createdAt', 'modifiedAt' ], 'date', 'format' => Yii::$app->formatter->datetimeFormat ]
-        ];
+		$rules = [
+			[ [ 'parentId', 'parentType', 'type' ], 'required' ],
+			[ [ 'id', 'content', 'data' ], 'safe' ],
+			[ 'currency', 'string', 'min' => 1, 'max' => Yii::$app->core->smallText ],
+			[ [ 'parentType', 'type', 'mode', 'code', 'service' ], 'string', 'min' => 1, 'max' => Yii::$app->core->mediumText ],
+			[ [ 'title' ], 'string', 'min' => 1, 'max' => Yii::$app->core->largeText ],
+			[ [ 'description' ], 'string', 'min' => 0, 'max' => Yii::$app->core->xLargeText ],
+			[ [ 'amount' ], 'number', 'min' => 0 ],
+			[ [ 'createdBy', 'modifiedBy', 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ],
+			[ [ 'processedAt' ], 'date', 'format' => Yii::$app->formatter->dateFormat ],
+			[ [ 'createdAt', 'modifiedAt' ], 'date', 'format' => Yii::$app->formatter->datetimeFormat ]
+		];
 
-        if ( Yii::$app->core->trimFieldValue ) {
+		if ( Yii::$app->core->trimFieldValue ) {
 
 			$trim[] = [ [ 'description' ], 'filter', 'filter' => 'trim', 'skipOnArray' => true ];
 
-            return ArrayHelper::merge( $trim, $rules );
-        }
+			return ArrayHelper::merge( $trim, $rules );
+		}
 
-        return $rules;
-    }
+		return $rules;
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels() {
+	/**
+	 * @inheritdoc
+	 */
+	public function attributeLabels() {
 
-        return [
-        	'type' => Yii::$app ->cartMessage->getMessage( CartGlobal::FIELD_TXN_TYPE )
-        ];
-    }
+		return [
+			'type' => Yii::$app ->cartMessage->getMessage( CartGlobal::FIELD_TXN_TYPE )
+		];
+	}
 
 	// CMG interfaces ------------------------
 
@@ -170,13 +170,13 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 
 	// yii\db\ActiveRecord ----
 
-    /**
-     * @inheritdoc
-     */
-    public static function tableName() {
+	/**
+	 * @inheritdoc
+	 */
+	public static function tableName() {
 
-        return PaymentTables::TABLE_TRANSACTION;
-    }
+		return PaymentTables::TABLE_TRANSACTION;
+	}
 
 	// CMG parent classes --------------------
 

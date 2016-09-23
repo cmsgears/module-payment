@@ -25,16 +25,41 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 	public static $modelClass	= '\cmsgears\payment\common\models\entities\Transaction';
 
-	// Static Methods ----------------------------------------------
+	public static $modelTable	= PaymentTables::TABLE_TRANSACTION;
 
-	// Read ----------------
+	public static $parentType	= null;
 
-	public static function findById( $id ) {
+	// Protected --------------
 
-		$modelClass	= self::$modelClass;
+	// Variables -----------------------------
 
-		return $modelClass::findById( $id );
-	}
+	// Public -----------------
+
+	// Protected --------------
+
+	// Private ----------------
+
+	// Traits ------------------------------------------------------
+
+	// Constructor and Initialisation ------------------------------
+
+	// Instance methods --------------------------------------------
+
+	// Yii parent classes --------------------
+
+	// yii\base\Component -----
+
+	// CMG interfaces ------------------------
+
+	// CMG parent classes --------------------
+
+	// TransactionService --------------------
+
+	// Data Provider ------
+
+	// Read ---------------
+
+	// Read - Models ---
 
 	public function getPayments( $user = false ) {
 
@@ -71,30 +96,25 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 		return $payments;
 	}
 
-	// Data Provider ------
+	// Read - Lists ----
 
-	/**
-	 * @param array $config to generate query
-	 * @return ActiveDataProvider
-	 */
-	public static function getPagination( $config = [] ) {
+	// Read - Maps -----
 
-		return self::getDataProvider( new Payment(), $config );
-	}
+	// Read - Others ---
 
-	// Create -----------
+	// Create -------------
 
 	public function createTransaction( $config = [] ) {
 
 		$user			= Yii::$app->core->getAppUser();
-		$data			= isset( $config[ 'data' ] ) ? $config[ 'data' ] : null;
-		$processedAt	= isset( $config[ 'processedAt' ] ) ? $config[ 'processedAt' ] : null;
-		$creator		= isset( $config[ 'createdBy' ] ) ? $config[ 'createdBy' ] : $user->id;
+ 		$data			= isset( $config[ 'data' ] ) ? $config[ 'data' ] : null;
+ 		$processedAt	= isset( $config[ 'processedAt' ] ) ? $config[ 'processedAt' ] : null;
+ 		$creator		= isset( $config[ 'createdBy' ] ) ? $config[ 'createdBy' ] : $user->id;
 		$code			= isset( $config[ 'code' ] ) ? $config[ 'code' ] : null;
 
 		$transaction				= new Transaction();
-        $transaction->parentId      = $config[ 'parentId' ];
-        $transaction->parentType    = $config[ 'parentType' ];
+		$transaction->parentId		= $config[ 'parentId' ];
+		$transaction->parentType	= $config[ 'parentType' ];
 		$transaction->createdBy		= $creator;
 		$transaction->type			= $config[ 'type' ];
 		$transaction->mode			= $config[ 'mode' ];
@@ -102,7 +122,7 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 		$transaction->description	= $config[ 'description' ];
 		$transaction->currency		= $config[ 'currency' ];
 		$transaction->processedAt	= $processedAt;
-        $transaction->data          = $data;
+		$transaction->data			= $data;
 
 		$transaction->save();
 
@@ -110,12 +130,38 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 		return $transaction;
 	}
 
-	// Update -----------
+	// Update -------------
 
-    public function updateTransactionType( $transaction, $type ) {
+	public function updateTransactionType( $transaction, $type ) {
 
-        $transaction->type  = $type;
-        $transaction->update();
-    }
+		$transaction->type	= $type;
 
+		$transaction->update();
+	}
+
+	// Delete -------------
+
+	// Static Methods ----------------------------------------------
+
+	// CMG parent classes --------------------
+
+	// TransactionService --------------------
+
+	// Data Provider ------
+
+	// Read ---------------
+
+	// Read - Models ---
+
+	// Read - Lists ----
+
+	// Read - Maps -----
+
+	// Read - Others ---
+
+	// Create -------------
+
+	// Update -------------
+
+	// Delete -------------
 }

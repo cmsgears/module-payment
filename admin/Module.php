@@ -8,16 +8,16 @@ use \Yii;
 
 class Module extends \cmsgears\core\common\base\Module {
 
-    public $controllerNamespace = 'cmsgears\payment\admin\controllers';
+	public $controllerNamespace = 'cmsgears\payment\admin\controllers';
 
-	public $config 				= [ ];
+	public $config				= [ ];
 
-    public function init() {
+	public function init() {
 
-        parent::init();
+		parent::init();
 
-        $this->setViewPath( '@cmsgears/module-payment/admin/views' );
-    }
+		$this->setViewPath( '@cmsgears/module-payment/admin/views' );
+	}
 
 	public function getSidebarHtml() {
 

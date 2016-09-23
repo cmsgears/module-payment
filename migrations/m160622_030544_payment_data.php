@@ -23,16 +23,16 @@ class m160622_030544_payment_data extends \yii\db\Migration {
 		Yii::$app->core->setSite( $this->site );
 	}
 
-    public function up() {
+	public function up() {
 
-    }
+	}
 
-    public function down() {
+	public function down() {
 
-        echo "m160622_030544_payment_data will be deleted with m160621_014408_core and m160622_030538_payment.\n";
+		echo "m160622_030544_payment_data will be deleted with m160621_014408_core and m160622_030538_payment.\n";
 
-        return true;
-    }
+		return true;
+	}
 }
 
 ?>
