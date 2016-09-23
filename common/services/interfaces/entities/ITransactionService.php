@@ -29,6 +29,8 @@ interface ITransactionService extends \cmsgears\core\common\services\interfaces\
 
 	// Update -------------
 
+	public function updateTransactionType( $transaction, $type );
+
 	// Delete -------------
 
 }

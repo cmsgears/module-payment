@@ -90,6 +90,7 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 		$data			= isset( $config[ 'data' ] ) ? $config[ 'data' ] : null;
 		$processedAt	= isset( $config[ 'processedAt' ] ) ? $config[ 'processedAt' ] : null;
 		$creator		= isset( $config[ 'createdBy' ] ) ? $config[ 'createdBy' ] : $user->id;
+		$code			= isset( $config[ 'code' ] ) ? $config[ 'code' ] : null;
 
 		$transaction				= new Transaction();
         $transaction->parentId      = $config[ 'parentId' ];
@@ -111,7 +112,7 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 	// Update -----------
 
-    public static function updateTransactionType( $transaction, $type ) {
+    public function updateTransactionType( $transaction, $type ) {
 
         $transaction->type  = $type;
         $transaction->update();
