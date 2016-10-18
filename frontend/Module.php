@@ -1,12 +1,10 @@
 <?php
-namespace cmsgears\payment\admin;
+namespace cmsgears\payment\frontend;
 
 // Yii Imports
 use \Yii;
 
 // CMG Imports
-use cmsgears\core\common\config\CoreGlobal;
-use cmsgears\payment\common\config\PaymentGlobal;
 
 class Module extends \cmsgears\core\common\base\Module {
 
@@ -16,9 +14,7 @@ class Module extends \cmsgears\core\common\base\Module {
 
 	// Public -----------------
 
-	public $controllerNamespace = 'cmsgears\payment\admin\controllers';
-
-	public $config				= [ PaymentGlobal::CONFIG_PAYMENT ];
+	public $controllerNamespace = 'cmsgears\payment\frontend\controllers';
 
 	// Protected --------------
 
@@ -32,7 +28,7 @@ class Module extends \cmsgears\core\common\base\Module {
 
 		parent::init();
 
-		$this->setViewPath( '@cmsgears/module-payment/admin/views' );
+		$this->setViewPath( '@cmsgears/module-payment/frontend/views' );
 	}
 
 	// Instance methods --------------------------------------------
@@ -46,11 +42,4 @@ class Module extends \cmsgears\core\common\base\Module {
 	// CMG parent classes --------------------
 
 	// Module --------------------------------
-
-	public function getSidebarHtml() {
-
-		$path	= Yii::getAlias( '@cmsgears' ) . '/module-payment/admin/views/sidebar.php';
-
-		return $path;
-	}
 }

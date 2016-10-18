@@ -34,5 +34,3 @@ class m160622_030544_payment_data extends \yii\db\Migration {
 		return true;
 	}
 }
-
-?>

@@ -9,12 +9,14 @@ use yii\behaviors\TimestampBehavior;
 
 // CMG Imports
 use cmsgears\core\common\config\CoreGlobal;
-use cmsgears\cart\common\config\CartGlobal;
+use cmsgears\payment\common\config\PaymentGlobal;
 
 use cmsgears\payment\common\models\base\PaymentTables;
 
 use cmsgears\core\common\models\traits\resources\DataTrait;
 use cmsgears\core\common\models\traits\ResourceTrait;
+
+use cmsgears\core\common\behaviors\AuthorBehavior;
 
 /**
  * Transaction Entity - The primary class.
@@ -31,7 +33,7 @@ use cmsgears\core\common\models\traits\ResourceTrait;
  * @property string $code
  * @property string $service
  * @property integer $amount
- * @property integer $currency
+ * @property string $currency
  * @property datetime $createdAt
  * @property datetime $modifiedAt
  * @property string $content
@@ -46,16 +48,14 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 
 	// Constants --------------
 
+	// Transaction Modes
+
 	const MODE_OFFLINE		= 'offline';	// Direct - In hand
-	const MODE_FREE 		= 'free'; // Free
+	const MODE_FREE 		= 'free'; 		// Free
 
 	const MODE_CARD			= 'card';		// Any card
 	const MODE_DEBIT_C		= 'd-card';		// Specific for Debit Cards
 	const MODE_CREDIT_C		= 'c-card';		// Specific for Credit Cards
-
-	// Transaction Type
-	const TYPE_CREDIT		= 'credit';
-	const TYPE_DEBIG		= 'debit';
 
 	// Special offline
 	const MODE_CHEQUE		= 'cheque';
@@ -64,8 +64,15 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 	// Direct Transfers
 	const MODE_WIRE			= 'wire';
 
-	public static $modeList = [
+	// Transaction Types
 
+	const TYPE_CREDIT		= 'credit';
+	const TYPE_DEBIT		= 'debit';
+	const TYPE_REFUND		= 'refund';
+
+	// Public -----------------
+
+	public static $modeList = [
 		self::MODE_OFFLINE => 'Offline',
 		self::MODE_CARD => 'Card',
 		self::MODE_DEBIT_C => 'Debit Card',
@@ -74,7 +81,12 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 		self::MODE_DRAFT => 'Draft'
 	];
 
-	// Public -----------------
+	public static $typeList = [
+		self::TYPE_CREDIT => 'Credit',
+		self::TYPE_DEBIT => 'Debit',
+		self::TYPE_REFUND => 'Refund'
+	];
+
 
 	// Protected --------------
 
@@ -107,6 +119,9 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 	public function behaviors() {
 
 		return [
+			'authorBehavior' => [
+				'class' => AuthorBehavior::className()
+			],
 			'timestampBehavior' => [
 				'class' => TimestampBehavior::className(),
 				'createdAtAttribute' => 'createdAt',
@@ -132,8 +147,7 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 			[ [ 'description' ], 'string', 'min' => 0, 'max' => Yii::$app->core->xLargeText ],
 			[ [ 'amount' ], 'number', 'min' => 0 ],
 			[ [ 'createdBy', 'modifiedBy', 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ],
-			[ [ 'processedAt' ], 'date', 'format' => Yii::$app->formatter->dateFormat ],
-			[ [ 'createdAt', 'modifiedAt' ], 'date', 'format' => Yii::$app->formatter->datetimeFormat ]
+			[ [ 'createdAt', 'modifiedAt', 'processedAt' ], 'date', 'format' => Yii::$app->formatter->datetimeFormat ]
 		];
 
 		if ( Yii::$app->core->trimFieldValue ) {
@@ -152,7 +166,17 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 	public function attributeLabels() {
 
 		return [
-			'type' => Yii::$app ->cartMessage->getMessage( CartGlobal::FIELD_TXN_TYPE )
+			'type' => Yii::$app->paymentMessage->getMessage( PaymentGlobal::FIELD_TXN_TYPE ),
+			'title' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_TITLE ),
+			'description' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DESCRIPTION ),
+			'type' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_TYPE ),
+			'mode' => 'Model',
+			'code' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_CODE ),
+			'service' => 'Service',
+			'amount' => 'Amount',
+			'currency' => 'Currency',
+			'content' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_CONTENT ),
+			'data' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DATA )
 		];
 	}
 
@@ -189,11 +213,6 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 	public static function findByCodeService( $code, $service ) {
 
 		return self::find()->where( 'code=:code AND service=:service', [ ':code' => $code, ':service' => $service ] )->one();
-	}
-
-	public static function queryByPayment() {
-
-		return self::find();
 	}
 
 	// Create -----------------

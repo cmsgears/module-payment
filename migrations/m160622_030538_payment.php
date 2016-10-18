@@ -60,7 +60,7 @@ class m160622_030538_payment extends \yii\db\Migration {
 			'modifiedAt' => $this->dateTime(),
 			'content' => $this->text(),
 			'data' => $this->text(),
-			'processedAt' => $this->date()->defaultValue( null )
+			'processedAt' => $this->dateTime()->defaultValue( null )
 		], $this->options );
 
 		// Index for columns site, creator and modifier
@@ -92,5 +92,3 @@ class m160622_030538_payment extends \yii\db\Migration {
 		$this->dropForeignKey( 'fk_' . $this->prefix . 'transaction_modifier', $this->prefix . 'transaction' );
 	}
 }
-
-?>

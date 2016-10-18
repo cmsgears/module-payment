@@ -9,6 +9,6 @@ class PaymentTables {
 
 	// Resources ------------
 
-	// Mappers & Traits -----
+	// Mappers --------------
 
 }

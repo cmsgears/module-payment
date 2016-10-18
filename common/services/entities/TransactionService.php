@@ -57,44 +57,96 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 	// Data Provider ------
 
+	public function getPage( $config = [] ) {
+
+		$modelClass	= self::$modelClass;
+		$modelTable = self::$modelTable;
+
+		$sort = new Sort([
+			'attributes' => [
+				'title' => [
+					'asc' => [ "$modelTable.title" => SORT_ASC ],
+					'desc' => [ "$modelTable.title" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Title'
+				],
+				'type' => [
+					'asc' => [ "$modelTable.type" => SORT_ASC ],
+					'desc' => [ "$modelTable.type" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Type'
+				],
+				'mode' => [
+					'asc' => [ "$modelTable.mode" => SORT_ASC ],
+					'desc' => [ "$modelTable.mode" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Mode'
+				],
+				'service' => [
+					'asc' => [ "$modelTable.service" => SORT_ASC ],
+					'desc' => [ "$modelTable.service" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Service'
+				],
+				'amount' => [
+					'asc' => [ "$modelTable.amount" => SORT_ASC ],
+					'desc' => [ "$modelTable.amount" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Amount'
+				],
+				'currency' => [
+					'asc' => [ "$modelTable.currency" => SORT_ASC ],
+					'desc' => [ "$modelTable.currency" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Currency'
+				],
+				'cdate' => [
+					'asc' => [ "$modelTable.createdAt" => SORT_ASC ],
+					'desc' => [ "$modelTable.createdAt" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Created At'
+				],
+				'udate' => [
+					'asc' => [ "$modelTable.modifiedAt" => SORT_ASC ],
+					'desc' => [ "$modelTable.modifiedAt" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Updated At'
+				],
+				'pdate' => [
+					'asc' => [ "$modelTable.processedAt" => SORT_ASC ],
+					'desc' => [ "$modelTable.processedAt" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Processed At'
+				]
+			],
+			'defaultOrder' => [ 'cdate' => SORT_DESC ]
+		]);
+
+		if( !isset( $config[ 'sort' ] ) ) {
+
+			$config[ 'sort' ] = $sort;
+		}
+
+		return parent::getPage( $config );
+	}
+
+	public function getPageByCreatorId( $creatorId ) {
+
+		$modelTable = self::$modelTable;
+
+		return $this->getPage( [ 'conditions' => [ "$modelTable.createdBy" => $creatorId ] ] );
+	}
+
+	public function getPageByParent( $parentId, $parentType ) {
+
+		$modelTable = self::$modelTable;
+
+		return $this->getPage( [ 'conditions' => [ "$modelTable.parentId" => $parentId, "$modelTable.parentType" => $parentType ] ] );
+	}
+
 	// Read ---------------
 
 	// Read - Models ---
-
-	public function getPayments( $user = false ) {
-
-		$modelClass	= self::$modelClass;
-
-		$payments	= $modelClass::queryByPayment();
-
-		if( $user ) {
-
-			$user	= Yii::$app->user->getIdentity();
-
-			return $payments->where( 'createdBy=:creator', [ ':creator' => $user->id ] )->orderBy( 'createdAt DESC' )->all();
-		}
-
-		return $payments->orderBy( 'createdAt DESC' )->all();
-	}
-
-	public function getDatePayments() {
-
-		$query	= new Query();
-
-		$query->select( 'DATE_FORMAT(createdAt, "%m-%Y")' )
-		->from( PaymentTables::TABLE_TRANSACTION );
-
-
-		$query	= $query->createCommand();
-
-		$modelClass	= self::$modelClass;
-
-		$payments	= $modelClass::queryByPayment();
-
-		$payments	= $payments->groupBy( 'processedAt' )->all();
-
-		return $payments;
-	}
 
 	// Read - Lists ----
 
@@ -104,23 +156,26 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 	// Create -------------
 
-	public function createTransaction( $config = [] ) {
+	public function createByParams( $params = [], $config = [] ) {
 
-		$user			= Yii::$app->core->getAppUser();
- 		$data			= isset( $config[ 'data' ] ) ? $config[ 'data' ] : null;
- 		$processedAt	= isset( $config[ 'processedAt' ] ) ? $config[ 'processedAt' ] : null;
- 		$creator		= isset( $config[ 'createdBy' ] ) ? $config[ 'createdBy' ] : $user->id;
+		$desc			= isset( $config[ 'description' ] ) ? $config[ 'description' ] : null;
 		$code			= isset( $config[ 'code' ] ) ? $config[ 'code' ] : null;
+		$processedAt	= isset( $config[ 'processedAt' ] ) ? $config[ 'processedAt' ] : null;
+ 		$data			= isset( $config[ 'data' ] ) ? $config[ 'data' ] : null;
 
 		$transaction				= new Transaction();
+
+		// Mandatory
 		$transaction->parentId		= $config[ 'parentId' ];
 		$transaction->parentType	= $config[ 'parentType' ];
-		$transaction->createdBy		= $creator;
 		$transaction->type			= $config[ 'type' ];
 		$transaction->mode			= $config[ 'mode' ];
 		$transaction->amount		= $config[ 'amount' ];
-		$transaction->description	= $config[ 'description' ];
 		$transaction->currency		= $config[ 'currency' ];
+
+		// Optional
+		$transaction->description	= $desc;
+		$transaction->code			= $code;
 		$transaction->processedAt	= $processedAt;
 		$transaction->data			= $data;
 
@@ -131,13 +186,6 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 	}
 
 	// Update -------------
-
-	public function updateTransactionType( $transaction, $type ) {
-
-		$transaction->type	= $type;
-
-		$transaction->update();
-	}
 
 	// Delete -------------
 

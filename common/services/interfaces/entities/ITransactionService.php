@@ -13,11 +13,11 @@ interface ITransactionService extends \cmsgears\core\common\services\interfaces\
 
 	// Read ---------------
 
+	public function getPageByCreatorId( $creatorId );
+
+	public function getPageByParent( $parentId, $parentType );
+
 	// Read - Models ---
-
-	public function getPayments( $user = false );
-
-	public function getDatePayments();
 
 	// Read - Lists ----
 
@@ -25,12 +25,7 @@ interface ITransactionService extends \cmsgears\core\common\services\interfaces\
 
 	// Create -------------
 
-	public function createTransaction( $config = [] );
-
 	// Update -------------
 
-	public function updateTransactionType( $transaction, $type );
-
 	// Delete -------------
-
 }
