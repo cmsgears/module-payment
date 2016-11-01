@@ -158,20 +158,20 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 	public function createByParams( $params = [], $config = [] ) {
 
-		$desc			= isset( $config[ 'description' ] ) ? $config[ 'description' ] : null;
-		$code			= isset( $config[ 'code' ] ) ? $config[ 'code' ] : null;
-		$processedAt	= isset( $config[ 'processedAt' ] ) ? $config[ 'processedAt' ] : null;
- 		$data			= isset( $config[ 'data' ] ) ? $config[ 'data' ] : null;
+		$desc			= isset( $params[ 'description' ] ) ? $params[ 'description' ] : null;
+		$code			= isset( $params[ 'code' ] ) ? $params[ 'code' ] : null;
+		$processedAt	= isset( $params[ 'processedAt' ] ) ? $params[ 'processedAt' ] : null;
+ 		$data			= isset( $params[ 'data' ] ) ? $params[ 'data' ] : null;
 
-		$transaction				= new Transaction();
+		$transaction	= isset( $config[ 'transaction' ] ) ? $config[ 'transaction' ] : new Transaction();
 
 		// Mandatory
-		$transaction->parentId		= $config[ 'parentId' ];
-		$transaction->parentType	= $config[ 'parentType' ];
-		$transaction->type			= $config[ 'type' ];
-		$transaction->mode			= $config[ 'mode' ];
-		$transaction->amount		= $config[ 'amount' ];
-		$transaction->currency		= $config[ 'currency' ];
+		$transaction->parentId		= $params[ 'parentId' ];
+		$transaction->parentType	= $params[ 'parentType' ];
+		$transaction->type			= $params[ 'type' ];
+		$transaction->mode			= $params[ 'mode' ];
+		$transaction->amount		= $params[ 'amount' ];
+		$transaction->currency		= $params[ 'currency' ];
 
 		// Optional
 		$transaction->description	= $desc;
