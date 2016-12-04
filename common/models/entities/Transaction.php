@@ -166,7 +166,7 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 	public function attributeLabels() {
 
 		return [
-			'type' => Yii::$app->paymentMessage->getMessage( PaymentGlobal::FIELD_TXN_TYPE ),
+			'type' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_TXN_TYPE ),
 			'title' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_TITLE ),
 			'description' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DESCRIPTION ),
 			'type' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_TYPE ),
