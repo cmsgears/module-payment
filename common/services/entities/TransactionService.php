@@ -165,6 +165,12 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 		$transaction	= isset( $config[ 'transaction' ] ) ? $config[ 'transaction' ] : new Transaction();
 
+		// This condition is applies when we detach authorBehavior from transaction model, so in this case we need to set createdBy manually
+		if( isset( $params[ 'createdBy' ] ) ) {
+
+			$transaction->createdBy	= $params[ 'createdBy' ];
+		}
+
 		// Mandatory
 		$transaction->parentId		= $params[ 'parentId' ];
 		$transaction->parentType	= $params[ 'parentType' ];
