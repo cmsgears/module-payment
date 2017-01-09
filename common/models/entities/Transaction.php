@@ -139,12 +139,15 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 	public function rules() {
 
 		$rules = [
+			// Required, Safe
 			[ [ 'parentId', 'parentType', 'type' ], 'required' ],
 			[ [ 'id', 'content', 'data' ], 'safe' ],
+			// Text Limit
 			[ 'currency', 'string', 'min' => 1, 'max' => Yii::$app->core->smallText ],
 			[ [ 'parentType', 'type', 'mode', 'code', 'service' ], 'string', 'min' => 1, 'max' => Yii::$app->core->mediumText ],
-			[ [ 'title' ], 'string', 'min' => 1, 'max' => Yii::$app->core->largeText ],
-			[ [ 'description' ], 'string', 'min' => 0, 'max' => Yii::$app->core->xLargeText ],
+			[ [ 'title' ], 'string', 'min' => 1, 'max' => Yii::$app->core->xLargeText ],
+			[ [ 'description' ], 'string', 'min' => 0, 'max' => Yii::$app->core->xxLargeText ],
+			// Other
 			[ [ 'amount' ], 'number', 'min' => 0 ],
 			[ [ 'createdBy', 'modifiedBy', 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ],
 			[ [ 'createdAt', 'modifiedAt', 'processedAt' ], 'date', 'format' => Yii::$app->formatter->datetimeFormat ]
