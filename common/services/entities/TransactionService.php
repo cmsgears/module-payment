@@ -178,6 +178,7 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 		$transaction->mode			= $params[ 'mode' ];
 		$transaction->amount		= $params[ 'amount' ];
 		$transaction->currency		= $params[ 'currency' ];
+		$transaction->title			= $params[ 'title' ];
 
 		// Optional
 		$transaction->description	= $desc;
