@@ -1,13 +1,7 @@
 <?php
 namespace cmsgears\payment\common\services\entities;
 
-// Yii Imports
-use \Yii;
-use yii\db\Query;
-
 // CMG Imports
-use cmsgears\core\common\config\CoreGlobal;
-
 use cmsgears\payment\common\models\base\PaymentTables;
 use cmsgears\payment\common\models\entities\Transaction;
 
@@ -219,4 +213,5 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 	// Update -------------
 
 	// Delete -------------
+
 }
