@@ -4,8 +4,6 @@ use cmsgears\core\common\config\CoreGlobal;
 
 use cmsgears\core\common\models\entities\Site;
 use cmsgears\core\common\models\entities\User;
-use cmsgears\core\common\models\entities\Role;
-use cmsgears\core\common\models\entities\Permission;
 use cmsgears\core\common\models\resources\Form;
 use cmsgears\core\common\models\resources\FormField;
 
@@ -28,6 +26,7 @@ class m160622_030544_payment_data extends \yii\db\Migration {
 		// Table prefix
 		$this->prefix	= Yii::$app->migration->cmgPrefix;
 
+		// Site config
 		$this->site		= Site::findBySlug( CoreGlobal::SITE_MAIN );
 		$this->master	= User::findByUsername( Yii::$app->migration->getSiteMaster() );
 
@@ -65,7 +64,7 @@ class m160622_030544_payment_data extends \yii\db\Migration {
 
 		$fields	= [
 			[ $config->id, 'payments', 'Payments', FormField::TYPE_TOGGLE, false, 'required', 0, NULL, '{"title":"Payments Enabled"}' ],
-			[ $config->id, 'currency', 'Currency', FormField::TYPE_SELECT, false, 'required', 0, NULL, '{"title":"Currency","items":["USD","CAD"]}' ]
+			[ $config->id, 'currency', 'Currency', FormField::TYPE_SELECT, false, 'required', 0, NULL, '{"title":"Currency","items":["USD","CAD","GBP","EUR","INR"]}' ]
 		];
 
 		$this->batchInsert( $this->prefix . 'core_form_field', $columns, $fields );

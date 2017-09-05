@@ -1,9 +1,6 @@
 <?php
 namespace cmsgears\payment\frontend;
 
-// Yii Imports
-use \Yii;
-
 // CMG Imports
 
 class Module extends \cmsgears\core\common\base\Module {
@@ -42,4 +39,5 @@ class Module extends \cmsgears\core\common\base\Module {
 	// CMG parent classes --------------------
 
 	// Module --------------------------------
+
 }

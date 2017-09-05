@@ -1,22 +1,42 @@
 <?php
 namespace cmsgears\payment\common\config;
 
-// Yii Imports
-use \Yii;
-
 // CMG Imports
 use cmsgears\payment\common\config\PaymentGlobal;
 
 class PaymentProperties extends \cmsgears\core\common\config\CmgProperties {
 
+	// Variables ---------------------------------------------------
+
+	// Global -----------------
+
 	const PROP_PAYMENTS		= 'payments';
+
     const PROP_CURRENCY		= 'currency';
 
-	// Singleton instance
+	// Public -----------------
+
+	// Protected --------------
+
+	// Private ----------------
+
 	private static $instance;
 
 	// Constructor and Initialisation ------------------------------
 
+	// Instance methods --------------------------------------------
+
+	// Yii parent classes --------------------
+
+	// CMG parent classes --------------------
+
+	// PaymentProperties ---------------------
+
+	// Singleton
+
+	/**
+	 * Return Singleton instance.
+	 */
 	public static function getInstance() {
 
 		if( !isset( self::$instance ) ) {
@@ -28,6 +48,8 @@ class PaymentProperties extends \cmsgears\core\common\config\CmgProperties {
 
 		return self::$instance;
 	}
+
+	// Properties
 
 	public function isPayments() {
 

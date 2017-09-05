@@ -2,7 +2,7 @@
 namespace cmsgears\payment\common\models\entities;
 
 // Yii Imports
-use \Yii;
+use Yii;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\behaviors\TimestampBehavior;
@@ -13,8 +13,10 @@ use cmsgears\payment\common\config\PaymentGlobal;
 
 use cmsgears\payment\common\models\base\PaymentTables;
 
-use cmsgears\core\common\models\traits\resources\DataTrait;
+use cmsgears\core\common\models\traits\CreateModifyTrait;
 use cmsgears\core\common\models\traits\ResourceTrait;
+use cmsgears\core\common\models\traits\resources\DataTrait;
+use cmsgears\core\common\models\traits\mappers\FileTrait;
 
 use cmsgears\core\common\behaviors\AuthorBehavior;
 
@@ -34,11 +36,12 @@ use cmsgears\core\common\behaviors\AuthorBehavior;
  * @property string $service
  * @property integer $amount
  * @property string $currency
+ * @property string $link
  * @property datetime $createdAt
  * @property datetime $modifiedAt
+ * @property date $processedAt
  * @property string $content
  * @property string $data
- * @property date $processedAt
  */
 class Transaction extends \cmsgears\core\common\models\base\Entity {
 
@@ -74,6 +77,7 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 
 	public static $modeList = [
 		self::MODE_OFFLINE => 'Offline',
+		self::MODE_FREE => 'Free',
 		self::MODE_CARD => 'Card',
 		self::MODE_DEBIT_C => 'Debit Card',
 		self::MODE_CREDIT_C => 'Credit Card',
@@ -87,12 +91,13 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 		self::TYPE_REFUND => 'Refund'
 	];
 
-
 	// Protected --------------
 
 	// Variables -----------------------------
 
 	// Public -----------------
+
+	public $modelType	= PaymentGlobal::TYPE_TRANSACTION;
 
 	// Protected --------------
 
@@ -100,7 +105,9 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 
 	// Traits ------------------------------------------------------
 
+	use CreateModifyTrait;
 	use DataTrait;
+	use FileTrait;
 	use ResourceTrait;
 
 	// Constructor and Initialisation ------------------------------
@@ -145,17 +152,18 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 			// Text Limit
 			[ 'currency', 'string', 'min' => 1, 'max' => Yii::$app->core->smallText ],
 			[ [ 'parentType', 'type', 'mode', 'code', 'service' ], 'string', 'min' => 1, 'max' => Yii::$app->core->mediumText ],
-			[ [ 'title' ], 'string', 'min' => 1, 'max' => Yii::$app->core->xLargeText ],
-			[ [ 'description' ], 'string', 'min' => 0, 'max' => Yii::$app->core->xxLargeText ],
+			[ 'title', 'string', 'min' => 1, 'max' => Yii::$app->core->xLargeText ],
+			[ 'link', 'string', 'min' => 0, 'max' => Yii::$app->core->xxxLargeText ],
+			[ 'description', 'string', 'min' => 0, 'max' => Yii::$app->core->xtraLargeText ],
 			// Other
 			[ [ 'amount' ], 'number', 'min' => 0 ],
 			[ [ 'createdBy', 'modifiedBy', 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ],
-			[ [ 'createdAt', 'modifiedAt', 'processedAt' ], 'date', 'format' => Yii::$app->formatter->datetimeFormat ]
+			[ [ 'createdAt', 'modifiedAt', 'processedAt' ], 'date', 'type' => 'datetime' ]
 		];
 
-		if ( Yii::$app->core->trimFieldValue ) {
+		if( Yii::$app->core->trimFieldValue ) {
 
-			$trim[] = [ [ 'description' ], 'filter', 'filter' => 'trim', 'skipOnArray' => true ];
+			$trim[] = [ [ 'title', 'link', 'description' ], 'filter', 'filter' => 'trim', 'skipOnArray' => true ];
 
 			return ArrayHelper::merge( $trim, $rules );
 		}
@@ -172,11 +180,11 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 			'title' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_TITLE ),
 			'description' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DESCRIPTION ),
 			'type' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_TXN_TYPE ),
-			'mode' => 'Model',
-			'code' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_CODE ),
-			'service' => 'Service',
-			'amount' => 'Amount',
-			'currency' => 'Currency',
+			'mode' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_TXN_MODE ),
+			'code' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_TXN_CODE ),
+			'service' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_SERVICE ),
+			'amount' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_AMOUNT ),
+			'currency' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_CURRENCY ),
 			'content' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_CONTENT ),
 			'data' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DATA )
 		];
@@ -222,4 +230,5 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 	// Update -----------------
 
 	// Delete -----------------
+
 }

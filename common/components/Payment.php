@@ -2,10 +2,7 @@
 namespace cmsgears\payment\common\components;
 
 // Yii Imports
-use \Yii;
-
-// CMG Imports
-use cmsgears\core\common\config\CoreGlobal;
+use Yii;
 
 class Payment extends \yii\base\Component {
 
@@ -57,6 +54,7 @@ class Payment extends \yii\base\Component {
 
 		$factory->set( 'cmsgears\payment\common\services\interfaces\entities\ITransactionService', 'cmsgears\payment\common\services\entities\TransactionService' );
 	}
+
 	public function initEntityServices() {
 
 		$factory = Yii::$app->factory->getContainer();

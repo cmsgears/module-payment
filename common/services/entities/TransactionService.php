@@ -2,6 +2,8 @@
 namespace cmsgears\payment\common\services\entities;
 
 // CMG Imports
+use cmsgears\payment\common\config\PaymentGlobal;
+
 use cmsgears\payment\common\models\base\PaymentTables;
 use cmsgears\payment\common\models\entities\Transaction;
 
@@ -21,7 +23,7 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 	public static $modelTable	= PaymentTables::TABLE_TRANSACTION;
 
-	public static $parentType	= null;
+	public static $parentType	= PaymentGlobal::TYPE_TRANSACTION;
 
 	// Protected --------------
 
@@ -54,7 +56,9 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 	public function getPage( $config = [] ) {
 
 		$modelClass	= self::$modelClass;
-		$modelTable = self::$modelTable;
+		$modelTable	= self::$modelTable;
+
+		// Sorting ----------
 
 		$sort = new Sort([
 			'attributes' => [
@@ -120,6 +124,29 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 			$config[ 'sort' ] = $sort;
 		}
+
+		// Query ------------
+
+		// Filters ----------
+
+		// Searching --------
+
+		$searchCol	= Yii::$app->request->getQueryParam( 'search' );
+
+		if( isset( $searchCol ) ) {
+
+			$search = [ 'title' => "$modelTable.title", 'desc' => "$modelTable.description" ];
+
+			$config[ 'search-col' ] = $search[ $searchCol ];
+		}
+
+		// Reporting --------
+
+		$config[ 'report-col' ]	= [
+			'title' => "$modelTable.title", 'desc' => "$modelTable.description"
+		];
+
+		// Result -----------
 
 		return parent::getPage( $config );
 	}
