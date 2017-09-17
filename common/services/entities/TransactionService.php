@@ -7,6 +7,8 @@ use cmsgears\payment\common\config\PaymentGlobal;
 use cmsgears\payment\common\models\base\PaymentTables;
 use cmsgears\payment\common\models\entities\Transaction;
 
+use cmsgears\core\common\services\traits\DataTrait;
+
 use cmsgears\payment\common\services\interfaces\entities\ITransactionService;
 
 class TransactionService extends \cmsgears\core\common\services\base\EntityService implements ITransactionService {
@@ -36,6 +38,8 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 	// Private ----------------
 
 	// Traits ------------------------------------------------------
+
+	use DataTrait;
 
 	// Constructor and Initialisation ------------------------------
 
@@ -179,6 +183,7 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 	public function createByParams( $params = [], $config = [] ) {
 
+		$status			= isset( $params[ 'status' ] ) ? $params[ 'status' ] : Transaction::STATUS_NEW;
 		$desc			= isset( $params[ 'description' ] ) ? $params[ 'description' ] : null;
 		$code			= isset( $params[ 'code' ] ) ? $params[ 'code' ] : null;
 		$processedAt	= isset( $params[ 'processedAt' ] ) ? $params[ 'processedAt' ] : null;
@@ -195,6 +200,7 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 		// Mandatory
 		$transaction->parentId		= $params[ 'parentId' ];
 		$transaction->parentType	= $params[ 'parentType' ];
+		$transaction->status		= $status;
 		$transaction->type			= $params[ 'type' ];
 		$transaction->mode			= $params[ 'mode' ];
 		$transaction->amount		= $params[ 'amount' ];
@@ -214,6 +220,37 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 	}
 
 	// Update -------------
+
+	public function update( $model, $config = [] ) {
+
+		return parent::update( $model, [
+			'attributes' => [ 'title', 'description', 'mode', 'code', 'service', 'link' ]
+		]);
+	}
+
+	public function updateStatus( $model, $status ) {
+
+		$model->status	= $status;
+
+		return parent::update( $model, [
+			'attributes' => [ 'status' ]
+		]);
+	}
+
+	public function failed( $model ) {
+
+		$this->updateStatus( $model, Transaction::STATUS_FAILED );
+	}
+
+	public function declined( $model ) {
+
+		$this->updateStatus( $model, Transaction::STATUS_DECLINED );
+	}
+
+	public function success( $model ) {
+
+		$this->updateStatus( $model, Transaction::STATUS_SUCCESS );
+	}
 
 	// Delete -------------
 

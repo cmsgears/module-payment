@@ -34,6 +34,7 @@ use cmsgears\core\common\behaviors\AuthorBehavior;
  * @property string $mode
  * @property string $code
  * @property string $service
+ * @property integer $status
  * @property integer $amount
  * @property string $currency
  * @property string $link
@@ -73,9 +74,16 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 	const TYPE_DEBIT		= 'debit';
 	const TYPE_REFUND		= 'refund';
 
+	// Transaction Status
+
+	const STATUS_NEW		=   0;
+	const STATUS_FAILED		=  50;
+	const STATUS_DECLINED	= 100;
+	const STATUS_SUCCESS	= 500;
+
 	// Public -----------------
 
-	public static $modeList = [
+	public static $modeMap = [
 		self::MODE_OFFLINE => 'Offline',
 		self::MODE_FREE => 'Free',
 		self::MODE_CARD => 'Card',
@@ -85,10 +93,17 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 		self::MODE_DRAFT => 'Draft'
 	];
 
-	public static $typeList = [
+	public static $typeMap = [
 		self::TYPE_CREDIT => 'Credit',
 		self::TYPE_DEBIT => 'Debit',
 		self::TYPE_REFUND => 'Refund'
+	];
+
+	public static $statusMap = [
+		self::STATUS_NEW => 'New',
+		self::STATUS_FAILED => 'Failed',
+		self::STATUS_DECLINED => 'Declined',
+		self::STATUS_SUCCESS => 'Success'
 	];
 
 	// Protected --------------
@@ -156,7 +171,8 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 			[ 'link', 'string', 'min' => 0, 'max' => Yii::$app->core->xxxLargeText ],
 			[ 'description', 'string', 'min' => 0, 'max' => Yii::$app->core->xtraLargeText ],
 			// Other
-			[ [ 'amount' ], 'number', 'min' => 0 ],
+			[ 'amount', 'number', 'min' => 0 ],
+			[ 'status', 'number', 'integerOnly' => true, 'min' => 0 ],
 			[ [ 'createdBy', 'modifiedBy', 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ],
 			[ [ 'createdAt', 'modifiedAt', 'processedAt' ], 'date', 'type' => 'datetime' ]
 		];
@@ -183,6 +199,7 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 			'mode' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_TXN_MODE ),
 			'code' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_TXN_CODE ),
 			'service' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_SERVICE ),
+			'status' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_STATUS ),
 			'amount' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_AMOUNT ),
 			'currency' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_CURRENCY ),
 			'content' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_CONTENT ),
@@ -197,6 +214,26 @@ class Transaction extends \cmsgears\core\common\models\base\Entity {
 	// Validators ----------------------------
 
 	// Transaction ---------------------------
+
+	public function isNew() {
+
+		return $this->status == self::STATUS_NEW;
+	}
+
+	public function isFailed() {
+
+		return $this->status == self::STATUS_FAILED;
+	}
+
+	public function isDeclined() {
+
+		return $this->status == self::STATUS_DECLINED;
+	}
+
+	public function isSuccess() {
+
+		return $this->status == self::STATUS_SUCCESS;
+	}
 
 	// Static Methods ----------------------------------------------
 

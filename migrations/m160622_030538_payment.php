@@ -52,6 +52,7 @@ class m160622_030538_payment extends \yii\db\Migration {
 			'mode' => $this->string( Yii::$app->core->mediumText )->defaultValue( null ),
 			'code' => $this->string( Yii::$app->core->mediumText )->defaultValue( null ),
 			'service' => $this->string( Yii::$app->core->mediumText )->defaultValue( null ),
+			'status' => $this->smallInteger( 6 )->notNull()->defaultValue( 0 ),
 			'amount' => $this->double( 2 ),
 			'currency' => $this->string( Yii::$app->core->smallText )->notNull(),
 			'link' => $this->string( Yii::$app->core->xxxLargeText )->defaultValue( null ),
