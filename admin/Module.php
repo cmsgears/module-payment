@@ -2,10 +2,9 @@
 namespace cmsgears\payment\admin;
 
 // Yii Imports
-use \Yii;
+use Yii;
 
 // CMG Imports
-use cmsgears\core\common\config\CoreGlobal;
 use cmsgears\payment\common\config\PaymentGlobal;
 
 class Module extends \cmsgears\core\common\base\Module {

@@ -1,11 +1,7 @@
 <?php
 namespace cmsgears\payment\common\components;
 
-// Yii Imports
-use \Yii;
-
 // CMG Imports
-use cmsgears\core\common\config\CoreGlobal;
 use cmsgears\payment\common\config\PaymentGlobal;
 
 class MessageSource extends \yii\base\Component {
@@ -18,7 +14,8 @@ class MessageSource extends \yii\base\Component {
 
 	protected $messageDb = [
 		// Generic Fields
-
+		PaymentGlobal::FIELD_AMOUNT => 'Amount',
+		PaymentGlobal::FIELD_CURRENCY => 'Currency',
 		// Transactions
 		PaymentGlobal::FIELD_TXN_CODE => 'Code',
 		PaymentGlobal::FIELD_TXN_TYPE => 'Type',
