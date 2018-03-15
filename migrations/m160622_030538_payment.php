@@ -1,6 +1,22 @@
 <?php
+/**
+ * This file is part of CMSGears Framework. Please view License file distributed
+ * with the source code for license details.
+ *
+ * @link https://www.cmsgears.org/
+ * @copyright Copyright (c) 2015 VulpineCode Technologies Pvt. Ltd.
+ */
 
-class m160622_030538_payment extends \yii\db\Migration {
+// CMG Imports
+use cmsgears\core\common\base\Migration;
+
+/**
+ * The payment migration inserts the database tables of form module. It also insert the foreign
+ * keys if FK flag of migration component is true.
+ *
+ * @since 1.0.0
+ */
+class m160622_030538_payment extends Migration {
 
 	// Public Variables
 
@@ -46,21 +62,25 @@ class m160622_030538_payment extends \yii\db\Migration {
 			'modifiedBy' => $this->bigInteger( 20 ),
 			'parentId' => $this->bigInteger( 20 ),
 			'parentType' => $this->string( Yii::$app->core->mediumText ),
-			'title' => $this->string( Yii::$app->core->xLargeText )->notNull(),
+			'title' => $this->string( Yii::$app->core->xxLargeText )->notNull(),
 			'description' => $this->string( Yii::$app->core->xtraLargeText )->defaultValue( null ),
-			'type' => $this->string( Yii::$app->core->mediumText )->notNull(),
-			'mode' => $this->string( Yii::$app->core->mediumText )->defaultValue( null ),
+			'type' => $this->smallInteger( 6 )->notNull()->defaultValue( 0 ),
+			'mode' => $this->smallInteger( 6 )->notNull()->defaultValue( 0 ),
+			'refund' => $this->boolean()->notNull()->defaultValue( false ),
 			'code' => $this->string( Yii::$app->core->mediumText )->defaultValue( null ),
 			'service' => $this->string( Yii::$app->core->mediumText )->defaultValue( null ),
 			'status' => $this->smallInteger( 6 )->notNull()->defaultValue( 0 ),
-			'amount' => $this->double( 2 ),
+			'amount' => $this->double(),
 			'currency' => $this->string( Yii::$app->core->smallText )->notNull(),
 			'link' => $this->string( Yii::$app->core->xxxLargeText )->defaultValue( null ),
 			'createdAt' => $this->dateTime()->notNull(),
 			'modifiedAt' => $this->dateTime(),
 			'processedAt' => $this->dateTime()->defaultValue( null ),
-			'content' => $this->text(),
-			'data' => $this->text()
+			'content' => $this->mediumText(),
+			'data' => $this->mediumText(),
+			'gridCache' => $this->longText(),
+			'gridCacheValid' => $this->boolean()->notNull()->defaultValue( false ),
+			'gridCachedAt' => $this->dateTime()
 		], $this->options );
 
 		// Index for columns site, creator and modifier
@@ -91,4 +111,5 @@ class m160622_030538_payment extends \yii\db\Migration {
 		$this->dropForeignKey( 'fk_' . $this->prefix . 'transaction_creator', $this->prefix . 'payment_transaction' );
 		$this->dropForeignKey( 'fk_' . $this->prefix . 'transaction_modifier', $this->prefix . 'payment_transaction' );
 	}
+
 }

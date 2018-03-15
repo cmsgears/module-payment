@@ -1,14 +1,24 @@
 <?php
+/**
+ * This file is part of CMSGears Framework. Please view License file distributed
+ * with the source code for license details.
+ *
+ * @link https://www.cmsgears.org/
+ * @copyright Copyright (c) 2015 VulpineCode Technologies Pvt. Ltd.
+ */
+
 namespace cmsgears\payment\common\config;
 
 // CMG Imports
 use cmsgears\payment\common\config\PaymentGlobal;
 
-class PaymentProperties extends \cmsgears\core\common\config\CmgProperties {
+use cmsgears\core\common\config\Properties;
+
+class PaymentProperties extends Properties {
 
 	// Variables ---------------------------------------------------
 
-	// Global -----------------
+	// Globals ----------------
 
 	const PROP_PAYMENTS		= 'payments';
 
@@ -22,17 +32,9 @@ class PaymentProperties extends \cmsgears\core\common\config\CmgProperties {
 
 	private static $instance;
 
+	// Traits ------------------------------------------------------
+
 	// Constructor and Initialisation ------------------------------
-
-	// Instance methods --------------------------------------------
-
-	// Yii parent classes --------------------
-
-	// CMG parent classes --------------------
-
-	// PaymentProperties ---------------------
-
-	// Singleton
 
 	/**
 	 * Return Singleton instance.
@@ -49,15 +51,37 @@ class PaymentProperties extends \cmsgears\core\common\config\CmgProperties {
 		return self::$instance;
 	}
 
-	// Properties
+	// Instance methods --------------------------------------------
 
+	// Yii interfaces ------------------------
+
+	// Yii parent classes --------------------
+
+	// CMG interfaces ------------------------
+
+	// CMG parent classes --------------------
+
+	// PaymentProperties ---------------------
+
+	/**
+	 * Check whether payments are enabled. None of the payment systems will work if
+	 * it is disabled.
+	 *
+	 * @return boolean
+	 */
 	public function isPayments() {
 
-		$status = $this->properties[ self::PROP_PAYMENTS ];
+		return $this->properties[ self::PROP_PAYMENTS ];
 	}
 
+	/**
+	 * Returns the default currency of the application.
+	 *
+	 * @return string
+	 */
 	public function getCurrency() {
 
 		return $this->properties[ self::PROP_CURRENCY ];
 	}
+
 }

@@ -1,6 +1,16 @@
 <?php
+/**
+ * This file is part of CMSGears Framework. Please view License file distributed
+ * with the source code for license details.
+ *
+ * @link https://www.cmsgears.org/
+ * @copyright Copyright (c) 2015 VulpineCode Technologies Pvt. Ltd.
+ */
+
 // CMG Imports
 use cmsgears\core\common\config\CoreGlobal;
+
+use cmsgears\core\common\base\Migration;
 
 use cmsgears\core\common\models\entities\Site;
 use cmsgears\core\common\models\entities\User;
@@ -9,7 +19,12 @@ use cmsgears\core\common\models\resources\FormField;
 
 use cmsgears\core\common\utilities\DateUtil;
 
-class m160622_030544_payment_data extends \yii\db\Migration {
+/**
+ * The payment data migration inserts the base data required to run the application.
+ *
+ * @since 1.0.0
+ */
+class m160622_030544_payment_data extends Migration {
 
 	// Public Variables
 
@@ -45,20 +60,20 @@ class m160622_030544_payment_data extends \yii\db\Migration {
 	private function insertPaymentConfig() {
 
 		$this->insert( $this->prefix . 'core_form', [
-				'siteId' => $this->site->id,
-				'createdBy' => $this->master->id, 'modifiedBy' => $this->master->id,
-				'name' => 'Config Payment', 'slug' => 'config-payment',
-				'type' => CoreGlobal::TYPE_SYSTEM,
-				'description' => 'Payment configuration form.',
-				'successMessage' => 'All configurations saved successfully.',
-				'captcha' => false,
-				'visibility' => Form::VISIBILITY_PROTECTED,
-				'active' => true, 'userMail' => false,'adminMail' => false,
-				'createdAt' => DateUtil::getDateTime(),
-				'modifiedAt' => DateUtil::getDateTime()
+			'siteId' => $this->site->id,
+			'createdBy' => $this->master->id, 'modifiedBy' => $this->master->id,
+			'name' => 'Config Payment', 'slug' => 'config-payment',
+			'type' => CoreGlobal::TYPE_SYSTEM,
+			'description' => 'Payment configuration form.',
+			'successMessage' => 'All configurations saved successfully.',
+			'captcha' => false,
+			'visibility' => Form::VISIBILITY_PROTECTED,
+			'active' => true, 'userMail' => false,'adminMail' => false,
+			'createdAt' => DateUtil::getDateTime(),
+			'modifiedAt' => DateUtil::getDateTime()
 		]);
 
-		$config	= Form::findBySlug( 'config-Payment', CoreGlobal::TYPE_SYSTEM );
+		$config	= Form::findBySlugType( 'config-payment', CoreGlobal::TYPE_SYSTEM );
 
 		$columns = [ 'formId', 'name', 'label', 'type', 'compress', 'validators', 'order', 'icon', 'htmlOptions' ];
 
@@ -75,8 +90,8 @@ class m160622_030544_payment_data extends \yii\db\Migration {
 		$columns = [ 'modelId', 'name', 'label', 'type', 'valueType', 'value' ];
 
 		$metas	= [
-				[ $this->site->id, 'payments', 'Payments', 'payment','flag', '0' ],
-				[ $this->site->id, 'currency','Currency', 'payment','text', 'USD' ]
+			[ $this->site->id, 'payments', 'Payments', 'payment','flag', '0' ],
+			[ $this->site->id, 'currency','Currency', 'payment','text', 'USD' ]
 		];
 
 		$this->batchInsert( $this->prefix . 'core_site_meta', $columns, $metas );
@@ -88,4 +103,5 @@ class m160622_030544_payment_data extends \yii\db\Migration {
 
 		return true;
 	}
+
 }
