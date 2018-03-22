@@ -1,17 +1,32 @@
 <?php
-namespace cmsgears\payment\common\services\entities;
+/**
+ * This file is part of CMSGears Framework. Please view License file distributed
+ * with the source code for license details.
+ *
+ * @link https://www.cmsgears.org/
+ * @copyright Copyright (c) 2015 VulpineCode Technologies Pvt. Ltd.
+ */
+
+namespace cmsgears\payment\common\services\resources;
 
 // CMG Imports
 use cmsgears\payment\common\config\PaymentGlobal;
 
 use cmsgears\payment\common\models\base\PaymentTables;
-use cmsgears\payment\common\models\entities\Transaction;
+use cmsgears\payment\common\models\resources\Transaction;
 
-use cmsgears\core\common\services\traits\DataTrait;
+use cmsgears\payment\common\services\interfaces\resources\ITransactionService;
 
-use cmsgears\payment\common\services\interfaces\entities\ITransactionService;
+use cmsgears\core\common\services\base\ResourceService;
 
-class TransactionService extends \cmsgears\core\common\services\base\EntityService implements ITransactionService {
+use cmsgears\core\common\services\traits\resources\DataTrait;
+
+/**
+ * TransactionService provide service methods of transaction model.
+ *
+ * @since 1.0.0
+ */
+class TransactionService extends ResourceService implements ITransactionService {
 
 	// Variables ---------------------------------------------------
 
@@ -21,7 +36,7 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 	// Public -----------------
 
-	public static $modelClass	= '\cmsgears\payment\common\models\entities\Transaction';
+	public static $modelClass	= '\cmsgears\payment\common\models\resources\Transaction';
 
 	public static $modelTable	= PaymentTables::TABLE_TRANSACTION;
 
@@ -253,6 +268,14 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 	}
 
 	// Delete -------------
+
+	// Bulk ---------------
+
+	// Notifications ------
+
+	// Cache --------------
+
+	// Additional ---------
 
 	// Static Methods ----------------------------------------------
 

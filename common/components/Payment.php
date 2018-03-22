@@ -1,10 +1,24 @@
 <?php
+/**
+ * This file is part of CMSGears Framework. Please view License file distributed
+ * with the source code for license details.
+ *
+ * @link https://www.cmsgears.org/
+ * @copyright Copyright (c) 2015 VulpineCode Technologies Pvt. Ltd.
+ */
+
 namespace cmsgears\payment\common\components;
 
 // Yii Imports
 use Yii;
+use yii\base\Component;
 
-class Payment extends \yii\base\Component {
+/**
+ * Payment component register the services provided by Payment Module.
+ *
+ * @since 1.0.0
+ */
+class Payment extends Component {
 
 	// Global -----------------
 
@@ -17,13 +31,13 @@ class Payment extends \yii\base\Component {
 	// Constructor and Initialisation ------------------------------
 
 	/**
-	 * Initialise the CMG Core Component.
+	 * Initialize the services.
 	 */
 	public function init() {
 
 		parent::init();
 
-		// Register application components and objects i.e. CMG and Project
+		// Register components and objects
 		$this->registerComponents();
 	}
 
@@ -35,30 +49,40 @@ class Payment extends \yii\base\Component {
 
 	// Cms -----------------------------------
 
-	// Properties
+	// Properties ----------------
 
-	// Components and Objects
+	// Components and Objects ----
 
+	/**
+	 * Register the services.
+	 */
 	public function registerComponents() {
 
 		// Register services
-		$this->registerEntityServices();
+		$this->registerResourceServices();
 
 		// Init services
-		$this->initEntityServices();
+		$this->initResourceServices();
 	}
 
-	public function registerEntityServices() {
+	/**
+	 * Registers resource services.
+	 */
+	public function registerResourceServices() {
 
 		$factory = Yii::$app->factory->getContainer();
 
-		$factory->set( 'cmsgears\payment\common\services\interfaces\entities\ITransactionService', 'cmsgears\payment\common\services\entities\TransactionService' );
+		$factory->set( 'cmsgears\payment\common\services\interfaces\resources\ITransactionService', 'cmsgears\payment\common\services\resources\TransactionService' );
 	}
 
-	public function initEntityServices() {
+	/**
+	 * Initialize resource services.
+	 */
+	public function initResourceServices() {
 
 		$factory = Yii::$app->factory->getContainer();
 
-		$factory->set( 'transactionService', 'cmsgears\payment\common\services\entities\TransactionService' );
+		$factory->set( 'transactionService', 'cmsgears\payment\common\services\resources\TransactionService' );
 	}
+
 }
