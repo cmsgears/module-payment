@@ -12,7 +12,6 @@ namespace cmsgears\payment\common\services\resources;
 // CMG Imports
 use cmsgears\payment\common\config\PaymentGlobal;
 
-use cmsgears\payment\common\models\base\PaymentTables;
 use cmsgears\payment\common\models\resources\Transaction;
 
 use cmsgears\payment\common\services\interfaces\resources\ITransactionService;
@@ -37,8 +36,6 @@ class TransactionService extends ResourceService implements ITransactionService 
 	// Public -----------------
 
 	public static $modelClass	= '\cmsgears\payment\common\models\resources\Transaction';
-
-	public static $modelTable	= PaymentTables::TABLE_TRANSACTION;
 
 	public static $parentType	= PaymentGlobal::TYPE_TRANSACTION;
 
@@ -74,13 +71,19 @@ class TransactionService extends ResourceService implements ITransactionService 
 
 	public function getPage( $config = [] ) {
 
-		$modelClass	= self::$modelClass;
-		$modelTable	= self::$modelTable;
+		$modelClass	= static::$modelClass;
+		$modelTable	= $this->getModelTable();
 
 		// Sorting ----------
 
 		$sort = new Sort([
 			'attributes' => [
+				'id' => [
+					'asc' => [ "$modelTable.id" => SORT_ASC ],
+					'desc' => [ "$modelTable.id" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Id'
+				],
 				'title' => [
 					'asc' => [ "$modelTable.title" => SORT_ASC ],
 					'desc' => [ "$modelTable.title" => SORT_DESC ],
@@ -154,7 +157,10 @@ class TransactionService extends ResourceService implements ITransactionService 
 
 		if( isset( $searchCol ) ) {
 
-			$search = [ 'title' => "$modelTable.title", 'desc' => "$modelTable.description" ];
+			$search = [
+				'title' => "$modelTable.title",
+				'desc' => "$modelTable.description"
+			];
 
 			$config[ 'search-col' ] = $search[ $searchCol ];
 		}
@@ -162,7 +168,8 @@ class TransactionService extends ResourceService implements ITransactionService 
 		// Reporting --------
 
 		$config[ 'report-col' ]	= [
-			'title' => "$modelTable.title", 'desc' => "$modelTable.description"
+			'title' => "$modelTable.title",
+			'desc' => "$modelTable.description"
 		];
 
 		// Result -----------
