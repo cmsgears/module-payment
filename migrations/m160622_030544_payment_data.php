@@ -65,10 +65,10 @@ class m160622_030544_payment_data extends Migration {
 			'name' => 'Config Payment', 'slug' => 'config-payment',
 			'type' => CoreGlobal::TYPE_SYSTEM,
 			'description' => 'Payment configuration form.',
-			'successMessage' => 'All configurations saved successfully.',
+			'success' => 'All configurations saved successfully.',
 			'captcha' => false,
 			'visibility' => Form::VISIBILITY_PROTECTED,
-			'active' => true, 'userMail' => false,'adminMail' => false,
+			'status' => Form::STATUS_ACTIVE, 'userMail' => false,'adminMail' => false,
 			'createdAt' => DateUtil::getDateTime(),
 			'modifiedAt' => DateUtil::getDateTime()
 		]);
