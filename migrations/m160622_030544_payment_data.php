@@ -87,11 +87,11 @@ class m160622_030544_payment_data extends Migration {
 
 	private function insertDefaultConfig() {
 
-		$columns = [ 'modelId', 'name', 'label', 'type', 'valueType', 'value' ];
+		$columns = [ 'modelId', 'name', 'label', 'type', 'active', 'valueType', 'value', 'data' ];
 
 		$metas	= [
-			[ $this->site->id, 'payments', 'Payments', 'payment','flag', '0' ],
-			[ $this->site->id, 'currency','Currency', 'payment','text', 'USD' ]
+			[ $this->site->id, 'payments', 'Payments', 'payment', 1, 'flag', '0', NULL ],
+			[ $this->site->id, 'currency','Currency', 'payment', 1, 'text', 'USD', NULL ]
 		];
 
 		$this->batchInsert( $this->prefix . 'core_site_meta', $columns, $metas );
