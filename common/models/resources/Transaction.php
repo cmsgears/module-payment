@@ -135,7 +135,7 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 
 	// Protected --------------
 
-	protected $modelType	= PaymentGlobal::TYPE_TRANSACTION;
+	protected $modelType = PaymentGlobal::TYPE_TRANSACTION;
 
 	// Private ----------------
 
