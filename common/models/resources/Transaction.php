@@ -43,6 +43,7 @@ use cmsgears\core\common\behaviors\AuthorBehavior;
  * Transaction represents a financial transaction.
  *
  * @property integer $id
+* @property integer $userId
  * @property integer $createdBy
  * @property integer $modifiedBy
  * @property integer $parentId
@@ -189,7 +190,7 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 		$rules = [
 			// Required, Safe
 			[ [ 'parentId', 'parentType', 'type' ], 'required' ],
-			[ [ 'id', 'content', 'data', 'gridCache', 'siteId', 'service' ], 'safe' ],
+			[ [ 'id', 'content', 'data', 'gridCache', 'siteId', 'service', 'userId' ], 'safe' ],
 			// Text Limit
 			[ 'currency', 'string', 'min' => 1, 'max' => Yii::$app->core->smallText ],
 			[ [ 'parentType', 'code', 'service' ], 'string', 'min' => 1, 'max' => Yii::$app->core->mediumText ],
@@ -222,6 +223,7 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 
 		return [
 			'siteId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_SITE ),
+			'userId' => 'User Id',
 			'parentId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_PARENT ),
 			'title' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_TITLE ),
 			'description' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DESCRIPTION ),
