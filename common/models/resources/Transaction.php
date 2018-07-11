@@ -34,6 +34,8 @@ use cmsgears\core\common\models\traits\base\ModelResourceTrait;
 use cmsgears\core\common\models\traits\resources\DataTrait;
 use cmsgears\core\common\models\traits\resources\GridCacheTrait;
 use cmsgears\core\common\models\traits\mappers\FileTrait;
+use cmsgears\core\common\models\traits\base\MultisiteTrait;
+
 
 use cmsgears\core\common\behaviors\AuthorBehavior;
 
@@ -146,6 +148,7 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 	use FileTrait;
 	use GridCacheTrait;
 	use ModelResourceTrait;
+	use MultisiteTrait;
 
 	// Constructor and Initialisation ------------------------------
 
@@ -186,7 +189,7 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 		$rules = [
 			// Required, Safe
 			[ [ 'parentId', 'parentType', 'type' ], 'required' ],
-			[ [ 'id', 'content', 'data', 'gridCache' ], 'safe' ],
+			[ [ 'id', 'content', 'data', 'gridCache', 'siteId' ], 'safe' ],
 			// Text Limit
 			[ 'currency', 'string', 'min' => 1, 'max' => Yii::$app->core->smallText ],
 			[ [ 'parentType', 'code', 'service' ], 'string', 'min' => 1, 'max' => Yii::$app->core->mediumText ],
@@ -217,6 +220,7 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 	public function attributeLabels() {
 
 		return [
+			'siteId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_SITE ),
 			'parentId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_PARENT ),
 			'title' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_TITLE ),
 			'description' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DESCRIPTION ),
