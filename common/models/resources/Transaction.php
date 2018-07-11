@@ -189,13 +189,14 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 		$rules = [
 			// Required, Safe
 			[ [ 'parentId', 'parentType', 'type' ], 'required' ],
-			[ [ 'id', 'content', 'data', 'gridCache', 'siteId' ], 'safe' ],
+			[ [ 'id', 'content', 'data', 'gridCache', 'siteId', 'service' ], 'safe' ],
 			// Text Limit
 			[ 'currency', 'string', 'min' => 1, 'max' => Yii::$app->core->smallText ],
 			[ [ 'parentType', 'code', 'service' ], 'string', 'min' => 1, 'max' => Yii::$app->core->mediumText ],
 			[ 'title', 'string', 'min' => 1, 'max' => Yii::$app->core->xxLargeText ],
 			[ 'link', 'string', 'min' => 0, 'max' => Yii::$app->core->xxxLargeText ],
 			[ 'description', 'string', 'min' => 0, 'max' => Yii::$app->core->xtraLargeText ],
+			[ 'refund', 'boolean' ],
 			// Other
 			[ 'amount', 'number', 'min' => 0 ],
 			[ [ 'type', 'mode', 'status' ], 'number', 'integerOnly' => true, 'min' => 0 ],
