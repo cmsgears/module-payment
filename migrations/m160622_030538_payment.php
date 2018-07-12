@@ -58,6 +58,7 @@ class m160622_030538_payment extends Migration {
 
 		$this->createTable( $this->prefix . 'payment_transaction', [
 			'id' => $this->bigPrimaryKey( 20 ),
+			'userId' => $this->bigInteger( 20 ),
 			'siteId' => $this->bigInteger( 20 ),
 			'createdBy' => $this->bigInteger( 20 )->notNull(),
 			'modifiedBy' => $this->bigInteger( 20 ),
