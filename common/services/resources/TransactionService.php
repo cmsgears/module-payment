@@ -10,6 +10,7 @@
 namespace cmsgears\payment\common\services\resources;
 
 // CMG Imports
+use Yii;
 use cmsgears\payment\common\config\PaymentGlobal;
 
 use cmsgears\payment\common\models\resources\Transaction;
@@ -212,11 +213,22 @@ class TransactionService extends ResourceService implements ITransactionService 
  		$data			= isset( $params[ 'data' ] ) ? $params[ 'data' ] : null;
 
 		$transaction	= isset( $config[ 'transaction' ] ) ? $config[ 'transaction' ] : new Transaction();
+ 		$link			= isset( $params[ 'link' ] ) ? $params[ 'link' ] : null;
+ 		$userId			= isset( $params[ 'userId' ] ) ? $params[ 'userId' ] : null;
 
 		// This condition is applies when we detach authorBehavior from transaction model, so in this case we need to set createdBy manually
 		if( isset( $params[ 'createdBy' ] ) ) {
 
 			$transaction->createdBy	= $params[ 'createdBy' ];
+		}
+
+		$modelClass	= new static::$modelClass;
+
+		$ignoreSite	= $config[ 'ignoreSite' ] ?? false;
+
+		if( $modelClass::isMultiSite() && !$ignoreSite ) {
+
+			$transaction->siteId	= $config[ 'siteId' ] ?? Yii::$app->core->siteId;
 		}
 
 		// Mandatory
@@ -234,6 +246,8 @@ class TransactionService extends ResourceService implements ITransactionService 
 		$transaction->code			= $code;
 		$transaction->processedAt	= $processedAt;
 		$transaction->data			= $data;
+		$transaction->link			= $link;
+		$transaction->userId		= $userId;
 
 		$transaction->save();
 

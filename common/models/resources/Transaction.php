@@ -22,7 +22,6 @@ use cmsgears\payment\common\config\PaymentGlobal;
 use cmsgears\payment\common\models\base\PaymentTables;
 
 use cmsgears\core\common\models\interfaces\base\IAuthor;
-use cmsgears\core\common\models\interfaces\base\IModelResource;
 use cmsgears\core\common\models\interfaces\resources\IData;
 use cmsgears\core\common\models\interfaces\resources\IGridCache;
 use cmsgears\core\common\models\interfaces\mappers\IFile;
@@ -34,7 +33,7 @@ use cmsgears\core\common\models\traits\base\ModelResourceTrait;
 use cmsgears\core\common\models\traits\resources\DataTrait;
 use cmsgears\core\common\models\traits\resources\GridCacheTrait;
 use cmsgears\core\common\models\traits\mappers\FileTrait;
-use cmsgears\core\common\models\traits\base\MultisiteTrait;
+use cmsgears\core\common\models\traits\base\MultiSiteTrait;
 
 
 use cmsgears\core\common\behaviors\AuthorBehavior;
@@ -68,7 +67,7 @@ use cmsgears\core\common\behaviors\AuthorBehavior;
  * @property boolean $gridCacheValid
  * @property datetime $gridCachedAt
  */
-class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridCache, IModelResource {
+class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridCache {
 
 	// Variables ---------------------------------------------------
 
@@ -149,7 +148,7 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 	use FileTrait;
 	use GridCacheTrait;
 	use ModelResourceTrait;
-	use MultisiteTrait;
+	use MultiSiteTrait;
 
 	// Constructor and Initialisation ------------------------------
 
