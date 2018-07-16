@@ -29,7 +29,6 @@ use cmsgears\core\common\models\interfaces\mappers\IFile;
 use cmsgears\core\common\models\base\ModelResource;
 
 use cmsgears\core\common\models\traits\base\AuthorTrait;
-use cmsgears\core\common\models\traits\base\ModelResourceTrait;
 use cmsgears\core\common\models\traits\resources\DataTrait;
 use cmsgears\core\common\models\traits\resources\GridCacheTrait;
 use cmsgears\core\common\models\traits\mappers\FileTrait;
@@ -147,7 +146,6 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 	use DataTrait;
 	use FileTrait;
 	use GridCacheTrait;
-	use ModelResourceTrait;
 	use MultiSiteTrait;
 
 	// Constructor and Initialisation ------------------------------
