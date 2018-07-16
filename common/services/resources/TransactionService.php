@@ -11,6 +11,7 @@ namespace cmsgears\payment\common\services\resources;
 
 // CMG Imports
 use Yii;
+use yii\data\Sort;
 use cmsgears\payment\common\config\PaymentGlobal;
 
 use cmsgears\payment\common\models\resources\Transaction;
@@ -180,14 +181,14 @@ class TransactionService extends ResourceService implements ITransactionService 
 
 	public function getPageByCreatorId( $creatorId ) {
 
-		$modelTable = self::$modelTable;
+		$modelTable = $this->getModelTable;
 
 		return $this->getPage( [ 'conditions' => [ "$modelTable.createdBy" => $creatorId ] ] );
 	}
 
 	public function getPageByParent( $parentId, $parentType ) {
 
-		$modelTable = self::$modelTable;
+		$modelTable = $this->getModelTable;
 
 		return $this->getPage( [ 'conditions' => [ "$modelTable.parentId" => $parentId, "$modelTable.parentType" => $parentType ] ] );
 	}

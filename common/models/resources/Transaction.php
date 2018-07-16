@@ -100,6 +100,7 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 
 	const STATUS_NEW		=   0;
 	const STATUS_FAILED		= 100;
+	const STATUS_PENDING	= 150;
 	const STATUS_DECLINED	= 200;
 	const STATUS_SUCCESS	= 500;
 
@@ -124,6 +125,7 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 	public static $statusMap = [
 		self::STATUS_NEW => 'New',
 		self::STATUS_FAILED => 'Failed',
+		self::STATUS_PENDING => 'Pending',
 		self::STATUS_DECLINED => 'Declined',
 		self::STATUS_SUCCESS => 'Success'
 	];
@@ -198,8 +200,7 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 			// Other
 			[ 'amount', 'number', 'min' => 0 ],
 			[ [ 'type', 'mode', 'status' ], 'number', 'integerOnly' => true, 'min' => 0 ],
-			[ [ 'createdBy', 'modifiedBy', 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ],
-			[ [ 'createdAt', 'modifiedAt', 'processedAt', 'gridCachedAt' ], 'date', 'type' => 'datetime' ]
+			[ [ 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ]
 		];
 
 		// Trim Text
@@ -224,14 +225,14 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 			'parentId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_PARENT ),
 			'title' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_TITLE ),
 			'description' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DESCRIPTION ),
-			'type' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_TXN_TYPE ),
-			'mode' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_TXN_MODE ),
-			'refund' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_TXN_MODE ),
-			'code' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_TXN_CODE ),
+			'type' => Yii::$app->paymentMessage->getMessage( PaymentGlobal::FIELD_TXN_TYPE ),
+			'mode' => Yii::$app->paymentMessage->getMessage( PaymentGlobal::FIELD_TXN_MODE ),
+			'refund' => Yii::$app->paymentMessage->getMessage( PaymentGlobal::FIELD_TXN_MODE ),
+			'code' => Yii::$app->paymentMessage->getMessage( PaymentGlobal::FIELD_TXN_CODE ),
 			'service' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_SERVICE ),
 			'status' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_STATUS ),
-			'amount' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_AMOUNT ),
-			'currency' => Yii::$app->transactionMessage->getMessage( PaymentGlobal::FIELD_CURRENCY ),
+			'amount' => Yii::$app->paymentMessage->getMessage( PaymentGlobal::FIELD_AMOUNT ),
+			'currency' => Yii::$app->paymentMessage->getMessage( PaymentGlobal::FIELD_CURRENCY ),
 			'link' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_LINK ),
 			'content' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_CONTENT ),
 			'data' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DATA ),
@@ -268,6 +269,16 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 	}
 
 	/**
+	 * Check whether transaction is failed.
+	 *
+	 * @return boolean
+	 */
+	public function isPending() {
+
+		return $this->status == self::STATUS_PENDING;
+	}
+
+	/**
 	 * Check whether transaction is declined.
 	 *
 	 * @return boolean
@@ -285,6 +296,11 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 	public function isSuccess() {
 
 		return $this->status == self::STATUS_SUCCESS;
+	}
+
+	public function getStatusStr(){
+		
+		return self::$statusMap[ $this->status ];
 	}
 
 	// Static Methods ----------------------------------------------
