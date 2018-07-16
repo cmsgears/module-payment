@@ -181,14 +181,14 @@ class TransactionService extends ResourceService implements ITransactionService 
 
 	public function getPageByCreatorId( $creatorId ) {
 
-		$modelTable = $this->getModelTable;
+		$modelTable = $this->getModelTable();
 
 		return $this->getPage( [ 'conditions' => [ "$modelTable.createdBy" => $creatorId ] ] );
 	}
 
 	public function getPageByParent( $parentId, $parentType ) {
 
-		$modelTable = $this->getModelTable;
+		$modelTable = $this->getModelTable();
 
 		return $this->getPage( [ 'conditions' => [ "$modelTable.parentId" => $parentId, "$modelTable.parentType" => $parentType ] ] );
 	}
