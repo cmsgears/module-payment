@@ -298,6 +298,16 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 		return $this->status == self::STATUS_SUCCESS;
 	}
 
+	public function isCredit() {
+
+		return $this->type == self::TYPE_CREDIT;
+	}
+	
+	public function isDebit() {
+
+		return $this->type == self::TYPE_DEBIT;
+	}
+
 	public function getStatusStr(){
 		
 		return self::$statusMap[ $this->status ];
