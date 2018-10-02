@@ -276,17 +276,17 @@ class TransactionService extends ResourceService implements ITransactionService 
 
 	public function failed( $model ) {
 
-		$this->updateStatus( $model, Transaction::STATUS_FAILED );
+		return $this->updateStatus( $model, Transaction::STATUS_FAILED );
 	}
 
 	public function declined( $model ) {
 
-		$this->updateStatus( $model, Transaction::STATUS_DECLINED );
+		return $this->updateStatus( $model, Transaction::STATUS_DECLINED );
 	}
 
 	public function success( $model ) {
 
-		$this->updateStatus( $model, Transaction::STATUS_SUCCESS );
+		return $this->updateStatus( $model, Transaction::STATUS_SUCCESS );
 	}
 
 	// Delete -------------
