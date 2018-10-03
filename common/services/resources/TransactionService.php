@@ -229,7 +229,7 @@ class TransactionService extends ResourceService implements ITransactionService 
 
 		if( $modelClass::isMultiSite() && !$ignoreSite ) {
 
-			$transaction->siteId	= $config[ 'siteId' ] ?? Yii::$app->core->siteId;
+			$transaction->siteId	= $config[ 'siteId' ] ?? Yii::$app->core->getSiteId();
 		}
 
 		// Mandatory
