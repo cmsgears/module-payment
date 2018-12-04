@@ -27,6 +27,7 @@ use cmsgears\core\common\models\interfaces\resources\IGridCache;
 use cmsgears\core\common\models\interfaces\mappers\IFile;
 
 use cmsgears\core\common\models\base\ModelResource;
+use cmsgears\core\common\models\entities\User;
 
 use cmsgears\core\common\models\traits\base\AuthorTrait;
 use cmsgears\core\common\models\traits\resources\DataTrait;
@@ -313,6 +314,10 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 		return self::$statusMap[ $this->status ];
 	}
 
+	public function getUser(){
+
+		return $this->hasOne( User::class, [ 'id' => 'userId' ] );
+	}
 	// Static Methods ----------------------------------------------
 
 	// Yii parent classes --------------------
