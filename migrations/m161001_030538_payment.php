@@ -7,16 +7,13 @@
  * @copyright Copyright (c) 2015 VulpineCode Technologies Pvt. Ltd.
  */
 
-// CMG Imports
-use cmsgears\core\common\base\Migration;
-
 /**
  * The payment migration inserts the database tables of form module. It also insert the foreign
  * keys if FK flag of migration component is true.
  *
  * @since 1.0.0
  */
-class m160622_030538_payment extends Migration {
+class m161001_030538_payment extends \cmsgears\core\common\base\Migration {
 
 	// Public Variables
 
@@ -30,11 +27,11 @@ class m160622_030538_payment extends Migration {
 	public function init() {
 
 		// Table prefix
-		$this->prefix		= Yii::$app->migration->cmgPrefix;
+		$this->prefix = Yii::$app->migration->cmgPrefix;
 
 		// Get the values via config
-		$this->fk			= Yii::$app->migration->isFk();
-		$this->options		= Yii::$app->migration->getTableOptions();
+		$this->fk		= Yii::$app->migration->isFk();
+		$this->options	= Yii::$app->migration->getTableOptions();
 
 		// Default collation
 		if( $this->db->driverName === 'mysql' ) {
@@ -58,11 +55,11 @@ class m160622_030538_payment extends Migration {
 
 		$this->createTable( $this->prefix . 'payment_transaction', [
 			'id' => $this->bigPrimaryKey( 20 ),
-			'userId' => $this->bigInteger( 20 ),
-			'siteId' => $this->bigInteger( 20 ),
+			'siteId' => $this->bigInteger( 20 )->defaultValue( null ),
+			'userId' => $this->bigInteger( 20 )->defaultValue( null ),
 			'createdBy' => $this->bigInteger( 20 )->notNull(),
-			'modifiedBy' => $this->bigInteger( 20 ),
-			'parentId' => $this->bigInteger( 20 ),
+			'modifiedBy' => $this->bigInteger( 20 )->defaultValue( null ),
+			'parentId' => $this->bigInteger( 20 )->notNull(),
 			'parentType' => $this->string( Yii::$app->core->mediumText ),
 			'title' => $this->string( Yii::$app->core->xxLargeText )->notNull(),
 			'description' => $this->string( Yii::$app->core->xtraLargeText )->defaultValue( null ),

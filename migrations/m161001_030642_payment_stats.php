@@ -19,7 +19,7 @@ use cmsgears\payment\common\models\base\PaymentTables;
  *
  * @since 1.0.0
  */
-class m160622_030642_payment_stats extends Migration {
+class m161001_030642_payment_stats extends Migration {
 
 	// Public Variables
 

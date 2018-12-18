@@ -24,7 +24,7 @@ use cmsgears\core\common\utilities\DateUtil;
  *
  * @since 1.0.0
  */
-class m160622_030544_payment_data extends Migration {
+class m161001_030544_payment_data extends Migration {
 
 	// Public Variables
 
@@ -99,7 +99,7 @@ class m160622_030544_payment_data extends Migration {
 
 	public function down() {
 
-		echo "m160622_030544_payment_data will be deleted with m160621_014408_core and m160622_030538_payment.\n";
+		echo "m161001_030544_payment_data will be deleted with m160621_014408_core and m161001_030538_payment.\n";
 
 		return true;
 	}

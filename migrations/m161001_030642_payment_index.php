@@ -17,7 +17,7 @@ use cmsgears\core\common\base\Migration;
  *
  * @since 1.0.0
  */
-class m160622_030642_payment_index extends Migration {
+class m161001_030642_payment_index extends Migration {
 
 	// Public Variables
 
