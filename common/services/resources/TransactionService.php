@@ -274,6 +274,11 @@ class TransactionService extends ResourceService implements ITransactionService 
 		]);
 	}
 
+	public function pending( $model ) {
+
+		return $this->updateStatus( $model, Transaction::STATUS_PENDING );
+	}
+
 	public function failed( $model ) {
 
 		return $this->updateStatus( $model, Transaction::STATUS_FAILED );
@@ -322,5 +327,61 @@ class TransactionService extends ResourceService implements ITransactionService 
 	// Update -------------
 
 	// Delete -------------
+
+	protected function applyBulk( $model, $column, $action, $target, $config = [] ) {
+
+		switch( $column ) {
+
+			case 'status': {
+
+				switch( $action ) {
+
+					case 'pending': {
+
+						$this->pending( $model );
+
+						break;
+					}
+
+					case 'failed': {
+
+						$this->failed( $model );
+
+						break;
+					}
+
+					case 'declined': {
+
+						$this->declined( $model );
+
+						break;
+					}
+
+					case 'success': {
+
+						$this->success( $model );
+
+						break;
+					}
+				}
+
+				break;
+			}
+			case 'model': {
+
+				switch( $action ) {
+
+					case 'delete': {
+
+						$this->delete( $model );
+
+						break;
+					}
+				}
+
+				break;
+			}
+		}
+	}
 
 }
