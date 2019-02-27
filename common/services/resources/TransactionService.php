@@ -1,17 +1,33 @@
 <?php
-namespace cmsgears\payment\common\services\entities;
+/**
+ * This file is part of CMSGears Framework. Please view License file distributed
+ * with the source code for license details.
+ *
+ * @link https://www.cmsgears.org/
+ * @copyright Copyright (c) 2015 VulpineCode Technologies Pvt. Ltd.
+ */
+
+namespace cmsgears\payment\common\services\resources;
 
 // CMG Imports
+use Yii;
+use yii\data\Sort;
 use cmsgears\payment\common\config\PaymentGlobal;
 
-use cmsgears\payment\common\models\base\PaymentTables;
-use cmsgears\payment\common\models\entities\Transaction;
+use cmsgears\payment\common\models\resources\Transaction;
 
-use cmsgears\core\common\services\traits\DataTrait;
+use cmsgears\payment\common\services\interfaces\resources\ITransactionService;
 
-use cmsgears\payment\common\services\interfaces\entities\ITransactionService;
+use cmsgears\core\common\services\base\ResourceService;
 
-class TransactionService extends \cmsgears\core\common\services\base\EntityService implements ITransactionService {
+use cmsgears\core\common\services\traits\resources\DataTrait;
+
+/**
+ * TransactionService provide service methods of transaction model.
+ *
+ * @since 1.0.0
+ */
+class TransactionService extends ResourceService implements ITransactionService {
 
 	// Variables ---------------------------------------------------
 
@@ -21,9 +37,7 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 	// Public -----------------
 
-	public static $modelClass	= '\cmsgears\payment\common\models\entities\Transaction';
-
-	public static $modelTable	= PaymentTables::TABLE_TRANSACTION;
+	public static $modelClass	= '\cmsgears\payment\common\models\resources\Transaction';
 
 	public static $parentType	= PaymentGlobal::TYPE_TRANSACTION;
 
@@ -59,13 +73,19 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 	public function getPage( $config = [] ) {
 
-		$modelClass	= self::$modelClass;
-		$modelTable	= self::$modelTable;
+		$modelClass	= static::$modelClass;
+		$modelTable	= $this->getModelTable();
 
 		// Sorting ----------
 
 		$sort = new Sort([
 			'attributes' => [
+				'id' => [
+					'asc' => [ "$modelTable.id" => SORT_ASC ],
+					'desc' => [ "$modelTable.id" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Id'
+				],
 				'title' => [
 					'asc' => [ "$modelTable.title" => SORT_ASC ],
 					'desc' => [ "$modelTable.title" => SORT_DESC ],
@@ -139,7 +159,10 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 		if( isset( $searchCol ) ) {
 
-			$search = [ 'title' => "$modelTable.title", 'desc' => "$modelTable.description" ];
+			$search = [
+				'title' => "$modelTable.title",
+				'desc' => "$modelTable.description"
+			];
 
 			$config[ 'search-col' ] = $search[ $searchCol ];
 		}
@@ -147,7 +170,8 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 		// Reporting --------
 
 		$config[ 'report-col' ]	= [
-			'title' => "$modelTable.title", 'desc' => "$modelTable.description"
+			'title' => "$modelTable.title",
+			'desc' => "$modelTable.description"
 		];
 
 		// Result -----------
@@ -157,14 +181,14 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 
 	public function getPageByCreatorId( $creatorId ) {
 
-		$modelTable = self::$modelTable;
+		$modelTable = $this->getModelTable();
 
 		return $this->getPage( [ 'conditions' => [ "$modelTable.createdBy" => $creatorId ] ] );
 	}
 
 	public function getPageByParent( $parentId, $parentType ) {
 
-		$modelTable = self::$modelTable;
+		$modelTable = $this->getModelTable();
 
 		return $this->getPage( [ 'conditions' => [ "$modelTable.parentId" => $parentId, "$modelTable.parentType" => $parentType ] ] );
 	}
@@ -190,11 +214,22 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
  		$data			= isset( $params[ 'data' ] ) ? $params[ 'data' ] : null;
 
 		$transaction	= isset( $config[ 'transaction' ] ) ? $config[ 'transaction' ] : new Transaction();
+ 		$link			= isset( $params[ 'link' ] ) ? $params[ 'link' ] : null;
+ 		$userId			= isset( $params[ 'userId' ] ) ? $params[ 'userId' ] : null;
 
 		// This condition is applies when we detach authorBehavior from transaction model, so in this case we need to set createdBy manually
 		if( isset( $params[ 'createdBy' ] ) ) {
 
 			$transaction->createdBy	= $params[ 'createdBy' ];
+		}
+
+		$modelClass	= new static::$modelClass;
+
+		$ignoreSite	= $config[ 'ignoreSite' ] ?? false;
+
+		if( $modelClass::isMultiSite() && !$ignoreSite ) {
+
+			$transaction->siteId	= $config[ 'siteId' ] ?? Yii::$app->core->getSiteId();
 		}
 
 		// Mandatory
@@ -212,6 +247,8 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 		$transaction->code			= $code;
 		$transaction->processedAt	= $processedAt;
 		$transaction->data			= $data;
+		$transaction->link			= $link;
+		$transaction->userId		= $userId;
 
 		$transaction->save();
 
@@ -237,22 +274,35 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 		]);
 	}
 
+	public function pending( $model ) {
+
+		return $this->updateStatus( $model, Transaction::STATUS_PENDING );
+	}
+
 	public function failed( $model ) {
 
-		$this->updateStatus( $model, Transaction::STATUS_FAILED );
+		return $this->updateStatus( $model, Transaction::STATUS_FAILED );
 	}
 
 	public function declined( $model ) {
 
-		$this->updateStatus( $model, Transaction::STATUS_DECLINED );
+		return $this->updateStatus( $model, Transaction::STATUS_DECLINED );
 	}
 
 	public function success( $model ) {
 
-		$this->updateStatus( $model, Transaction::STATUS_SUCCESS );
+		return $this->updateStatus( $model, Transaction::STATUS_SUCCESS );
 	}
 
 	// Delete -------------
+
+	// Bulk ---------------
+
+	// Notifications ------
+
+	// Cache --------------
+
+	// Additional ---------
 
 	// Static Methods ----------------------------------------------
 
@@ -277,5 +327,61 @@ class TransactionService extends \cmsgears\core\common\services\base\EntityServi
 	// Update -------------
 
 	// Delete -------------
+
+	protected function applyBulk( $model, $column, $action, $target, $config = [] ) {
+
+		switch( $column ) {
+
+			case 'status': {
+
+				switch( $action ) {
+
+					case 'pending': {
+
+						$this->pending( $model );
+
+						break;
+					}
+
+					case 'failed': {
+
+						$this->failed( $model );
+
+						break;
+					}
+
+					case 'declined': {
+
+						$this->declined( $model );
+
+						break;
+					}
+
+					case 'success': {
+
+						$this->success( $model );
+
+						break;
+					}
+				}
+
+				break;
+			}
+			case 'model': {
+
+				switch( $action ) {
+
+					case 'delete': {
+
+						$this->delete( $model );
+
+						break;
+					}
+				}
+
+				break;
+			}
+		}
+	}
 
 }

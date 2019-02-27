@@ -19,7 +19,8 @@ class MessageSource extends \yii\base\Component {
 		// Transactions
 		PaymentGlobal::FIELD_TXN_CODE => 'Code',
 		PaymentGlobal::FIELD_TXN_TYPE => 'Type',
-		PaymentGlobal::FIELD_TXN_MODE => 'Mode'
+		PaymentGlobal::FIELD_TXN_MODE => 'Mode',
+		PaymentGlobal::FIELD_REFUND => 'Refund'
 	];
 
 	// Private ----------------

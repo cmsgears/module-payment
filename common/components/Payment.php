@@ -1,10 +1,23 @@
 <?php
+/**
+ * This file is part of CMSGears Framework. Please view License file distributed
+ * with the source code for license details.
+ *
+ * @link https://www.cmsgears.org/
+ * @copyright Copyright (c) 2015 VulpineCode Technologies Pvt. Ltd.
+ */
+
 namespace cmsgears\payment\common\components;
 
-// Yii Imports
-use Yii;
+// CMG Imports
+use cmsgears\core\common\base\Component;
 
-class Payment extends \yii\base\Component {
+/**
+ * Payment component initialises the Payment Module.
+ *
+ * @since 1.0.0
+ */
+class Payment extends Component {
 
 	// Global -----------------
 
@@ -16,49 +29,12 @@ class Payment extends \yii\base\Component {
 
 	// Constructor and Initialisation ------------------------------
 
-	/**
-	 * Initialise the CMG Core Component.
-	 */
-	public function init() {
-
-		parent::init();
-
-		// Register application components and objects i.e. CMG and Project
-		$this->registerComponents();
-	}
-
 	// Instance methods --------------------------------------------
 
 	// Yii parent classes --------------------
 
 	// CMG parent classes --------------------
 
-	// Cms -----------------------------------
+	// Payment -------------------------------
 
-	// Properties
-
-	// Components and Objects
-
-	public function registerComponents() {
-
-		// Register services
-		$this->registerEntityServices();
-
-		// Init services
-		$this->initEntityServices();
-	}
-
-	public function registerEntityServices() {
-
-		$factory = Yii::$app->factory->getContainer();
-
-		$factory->set( 'cmsgears\payment\common\services\interfaces\entities\ITransactionService', 'cmsgears\payment\common\services\entities\TransactionService' );
-	}
-
-	public function initEntityServices() {
-
-		$factory = Yii::$app->factory->getContainer();
-
-		$factory->set( 'transactionService', 'cmsgears\payment\common\services\entities\TransactionService' );
-	}
 }
