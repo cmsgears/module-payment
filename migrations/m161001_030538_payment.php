@@ -42,8 +42,8 @@ class m161001_030538_payment extends \cmsgears\core\common\base\Migration {
 
 	public function up() {
 
-		// Payment
-		$this->upPayment();
+		// Transaction
+		$this->upTransaction();
 
 		if( $this->fk ) {
 
@@ -51,7 +51,7 @@ class m161001_030538_payment extends \cmsgears\core\common\base\Migration {
 		}
 	}
 
-	private function upPayment() {
+	private function upTransaction() {
 
 		$this->createTable( $this->prefix . 'payment_transaction', [
 			'id' => $this->bigPrimaryKey( 20 ),

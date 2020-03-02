@@ -26,7 +26,6 @@ use cmsgears\core\common\models\interfaces\resources\IData;
 use cmsgears\core\common\models\interfaces\resources\IGridCache;
 use cmsgears\core\common\models\interfaces\mappers\IFile;
 
-use cmsgears\core\common\models\base\ModelResource;
 use cmsgears\core\common\models\entities\User;
 
 use cmsgears\core\common\models\traits\base\AuthorTrait;
@@ -42,7 +41,8 @@ use cmsgears\core\common\behaviors\AuthorBehavior;
  * Transaction represents a financial transaction.
  *
  * @property integer $id
-* @property integer $userId
+ * @property integer $siteId
+ * @property integer $userId
  * @property integer $createdBy
  * @property integer $modifiedBy
  * @property integer $parentId
@@ -66,8 +66,10 @@ use cmsgears\core\common\behaviors\AuthorBehavior;
  * @property string $gridCache
  * @property boolean $gridCacheValid
  * @property datetime $gridCachedAt
+ *
+ * @since 1.0.0
  */
-class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridCache {
+class Transaction extends \cmsgears\core\common\models\base\ModelResource implements IAuthor, IData, IFile, IGridCache {
 
 	// Variables ---------------------------------------------------
 
@@ -100,9 +102,11 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 	// Transaction Status
 
 	const STATUS_NEW		=   0;
+	const STATUS_CANCELLED	=  50;
 	const STATUS_FAILED		= 100;
 	const STATUS_PENDING	= 150;
 	const STATUS_DECLINED	= 200;
+	const STATUS_REJECTED	= 250;
 	const STATUS_SUCCESS	= 500;
 
 	// Public -----------------
@@ -125,10 +129,22 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 
 	public static $statusMap = [
 		self::STATUS_NEW => 'New',
+		self::STATUS_CANCELLED => 'Cancelled',
 		self::STATUS_FAILED => 'Failed',
 		self::STATUS_PENDING => 'Pending',
 		self::STATUS_DECLINED => 'Declined',
+		self::STATUS_REJECTED => 'Rejected',
 		self::STATUS_SUCCESS => 'Success'
+	];
+
+	public static $urlRevStatusMap = [
+		'new' => self::STATUS_NEW,
+		'cancelled' => self::STATUS_CANCELLED,
+		'failed' => self::STATUS_FAILED,
+		'pending' => self::STATUS_PENDING,
+		'declined' => self::STATUS_DECLINED,
+		'rejected' => self::STATUS_REJECTED,
+		'success' => self::STATUS_SUCCESS
 	];
 
 	// Protected --------------
@@ -189,7 +205,7 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 		// Model Rules
 		$rules = [
 			// Required, Safe
-			[ [ 'parentId', 'parentType', 'type' ], 'required' ],
+			[ [ 'parentId', 'parentType', 'type', 'amount' ], 'required' ],
 			[ [ 'id', 'content', 'data', 'gridCache', 'siteId', 'service', 'userId' ], 'safe' ],
 			// Text Limit
 			[ 'currency', 'string', 'min' => 1, 'max' => Yii::$app->core->smallText ],
@@ -201,7 +217,7 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 			// Other
 			[ 'amount', 'number', 'min' => 0 ],
 			[ [ 'type', 'mode', 'status' ], 'number', 'integerOnly' => true, 'min' => 0 ],
-			[ [ 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ]
+			[ [ 'siteId', 'userId', 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ]
 		];
 
 		// Trim Text
@@ -222,7 +238,7 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 
 		return [
 			'siteId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_SITE ),
-			'userId' => 'User Id',
+			'userId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_USER ),
 			'parentId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_PARENT ),
 			'title' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_TITLE ),
 			'description' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DESCRIPTION ),
@@ -249,6 +265,11 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 
 	// Transaction ---------------------------
 
+	public function getUser(){
+
+		return $this->hasOne( User::class, [ 'id' => 'userId' ] );
+	}
+
 	/**
 	 * Check whether transaction is new.
 	 *
@@ -257,6 +278,16 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 	public function isNew() {
 
 		return $this->status == self::STATUS_NEW;
+	}
+
+	/**
+	 * Check whether transaction is cancelled.
+	 *
+	 * @return boolean
+	 */
+	public function isCancelled() {
+
+		return $this->status == self::STATUS_CANCELLED;
 	}
 
 	/**
@@ -290,6 +321,16 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 	}
 
 	/**
+	 * Check whether transaction is rejected.
+	 *
+	 * @return boolean
+	 */
+	public function isRejected() {
+
+		return $this->status == self::STATUS_REJECTED;
+	}
+
+	/**
 	 * Check whether transaction is successful.
 	 *
 	 * @return boolean
@@ -299,25 +340,31 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 		return $this->status == self::STATUS_SUCCESS;
 	}
 
+	/**
+	 * Check whether transaction is approved. Alias of success status.
+	 *
+	 * @return boolean
+	 */
+	public function isApproved() {
+
+		return $this->status == self::STATUS_SUCCESS;
+	}
+
 	public function isCredit() {
 
 		return $this->type == self::TYPE_CREDIT;
 	}
-	
+
 	public function isDebit() {
 
 		return $this->type == self::TYPE_DEBIT;
 	}
 
-	public function getStatusStr(){
-		
+	public function getStatusStr() {
+
 		return self::$statusMap[ $this->status ];
 	}
 
-	public function getUser(){
-
-		return $this->hasOne( User::class, [ 'id' => 'userId' ] );
-	}
 	// Static Methods ----------------------------------------------
 
 	// Yii parent classes --------------------
@@ -338,7 +385,17 @@ class Transaction extends ModelResource implements IAuthor, IData, IFile, IGridC
 
 	// Read - Query -----------
 
+	public static function queryByUserId( $userId ) {
+
+		return static::find()->where( 'userId=:uid', [ ':uid' => $userId ] );
+	}
+
 	// Read - Find ------------
+
+	public static function findByUserId( $userId ) {
+
+		return self::queryByUserId( $userId )->all();
+	}
 
 	/**
 	 * Find and return the transaction specific to given code and service.

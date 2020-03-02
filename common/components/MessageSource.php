@@ -1,10 +1,18 @@
 <?php
+/**
+ * This file is part of CMSGears Framework. Please view License file distributed
+ * with the source code for license details.
+ *
+ * @link https://www.cmsgears.org/
+ * @copyright Copyright (c) 2015 VulpineCode Technologies Pvt. Ltd.
+ */
+
 namespace cmsgears\payment\common\components;
 
 // CMG Imports
 use cmsgears\payment\common\config\PaymentGlobal;
 
-class MessageSource extends \yii\base\Component {
+class MessageSource extends \cmsgears\core\common\base\MessageSource {
 
 	// Global -----------------
 
@@ -35,8 +43,4 @@ class MessageSource extends \yii\base\Component {
 
 	// MessageSource -------------------------
 
-	public function getMessage( $messageKey, $params = [], $language = null ) {
-
-		return $this->messageDb[ $messageKey ];
-	}
 }

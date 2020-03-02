@@ -10,22 +10,20 @@
 namespace cmsgears\payment\common\services\interfaces\resources;
 
 // CMG Imports
-use cmsgears\core\common\services\interfaces\base\IResourceService;
+use cmsgears\core\common\services\interfaces\base\IModelResourceService;
 
 /**
  * ITransactionService declares methods specific to transaction model.
  *
  * @since 1.0.0
  */
-interface ITransactionService extends IResourceService {
+interface ITransactionService extends IModelResourceService {
 
 	// Data Provider ------
 
 	// Read ---------------
 
-	public function getPageByCreatorId( $creatorId );
-
-	public function getPageByParent( $parentId, $parentType );
+	public function getPageByUserId( $userId, $config = [] );
 
 	// Read - Models ---
 
@@ -38,6 +36,22 @@ interface ITransactionService extends IResourceService {
 	// Create -------------
 
 	// Update -------------
+
+	public function updateStatus( $model, $status );
+
+	public function cancel( $model, $config = [] );
+
+	public function fail( $model, $config = [] );
+
+	public function pending( $model, $config = [] );
+
+	public function decline( $model, $config = [] );
+
+	public function reject( $model, $config = [] );
+
+	public function success( $model, $config = [] );
+
+	public function approve( $model, $config = [] );
 
 	// Delete -------------
 
