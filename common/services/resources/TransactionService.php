@@ -135,6 +135,12 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 					'default' => SORT_DESC,
 					'label' => 'Currency'
 				],
+				'status' => [
+					'asc' => [ "$modelTable.status" => SORT_ASC ],
+					'desc' => [ "$modelTable.status" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Status'
+				],
 				'cdate' => [
 					'asc' => [ "$modelTable.createdAt" => SORT_ASC ],
 					'desc' => [ "$modelTable.createdAt" => SORT_DESC ],
@@ -310,8 +316,16 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 
 	public function update( $model, $config = [] ) {
 
+		$admin		= isset( $config[ 'admin' ] ) ? $config[ 'admin' ] : false;
+		$attributes	= isset( $config[ 'attributes' ] ) ? $config[ 'attributes' ] : [ 'title', 'description', 'mode', 'code', 'service', 'link' ];
+
+		if( $admin ) {
+
+			$attributes	= [ 'title', 'description', 'mode', 'code', 'service', 'link', 'type', 'status' ];
+		}
+
 		return parent::update( $model, [
-			'attributes' => [ 'title', 'description', 'mode', 'code', 'service', 'link' ]
+			'attributes' => $attributes
 		]);
 	}
 
