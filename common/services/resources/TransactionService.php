@@ -19,6 +19,7 @@ use cmsgears\payment\common\models\resources\Transaction;
 use cmsgears\core\common\services\interfaces\resources\IFileService;
 use cmsgears\payment\common\services\interfaces\resources\ITransactionService;
 
+use cmsgears\core\common\services\traits\cache\GridCacheTrait;
 use cmsgears\core\common\services\traits\resources\DataTrait;
 
 /**
@@ -55,6 +56,7 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 	// Traits ------------------------------------------------------
 
 	use DataTrait;
+	use GridCacheTrait;
 
 	// Constructor and Initialisation ------------------------------
 

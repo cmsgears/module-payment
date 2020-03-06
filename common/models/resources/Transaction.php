@@ -34,7 +34,6 @@ use cmsgears\core\common\models\traits\resources\GridCacheTrait;
 use cmsgears\core\common\models\traits\mappers\FileTrait;
 use cmsgears\core\common\models\traits\base\MultiSiteTrait;
 
-
 use cmsgears\core\common\behaviors\AuthorBehavior;
 
 /**
