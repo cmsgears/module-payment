@@ -57,7 +57,7 @@ class m161001_030538_payment extends \cmsgears\core\common\base\Migration {
 			'id' => $this->bigPrimaryKey( 20 ),
 			'siteId' => $this->bigInteger( 20 )->defaultValue( null ),
 			'userId' => $this->bigInteger( 20 )->defaultValue( null ),
-			'createdBy' => $this->bigInteger( 20 )->notNull(),
+			'createdBy' => $this->bigInteger( 20 )->defaultValue( null ),
 			'modifiedBy' => $this->bigInteger( 20 )->defaultValue( null ),
 			'parentId' => $this->bigInteger( 20 )->notNull(),
 			'parentType' => $this->string( Yii::$app->core->mediumText ),
