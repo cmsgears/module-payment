@@ -9,8 +9,7 @@
 
 // CMG Imports
 use cmsgears\core\common\config\CoreGlobal;
-
-use cmsgears\core\common\base\Migration;
+use cmsgears\payment\common\config\PaymentGlobal;
 
 use cmsgears\core\common\models\entities\Site;
 use cmsgears\core\common\models\entities\User;
@@ -24,7 +23,7 @@ use cmsgears\core\common\utilities\DateUtil;
  *
  * @since 1.0.0
  */
-class m161001_030544_payment_data extends Migration {
+class m161001_030544_payment_data extends \cmsgears\core\common\base\Migration {
 
 	// Public Variables
 
@@ -39,7 +38,7 @@ class m161001_030544_payment_data extends Migration {
 	public function init() {
 
 		// Table prefix
-		$this->prefix	= Yii::$app->migration->cmgPrefix;
+		$this->prefix = Yii::$app->migration->cmgPrefix;
 
 		// Site config
 		$this->site		= Site::findBySlug( CoreGlobal::SITE_MAIN );
@@ -62,7 +61,7 @@ class m161001_030544_payment_data extends Migration {
 		$this->insert( $this->prefix . 'core_form', [
 			'siteId' => $this->site->id,
 			'createdBy' => $this->master->id, 'modifiedBy' => $this->master->id,
-			'name' => 'Config Payment', 'slug' => 'config-payment',
+			'name' => 'Config Payment', 'slug' => 'config-' . PaymentGlobal::TYPE_PAYMENT,
 			'type' => CoreGlobal::TYPE_SYSTEM,
 			'description' => 'Payment configuration form.',
 			'success' => 'All configurations saved successfully.',
@@ -73,13 +72,13 @@ class m161001_030544_payment_data extends Migration {
 			'modifiedAt' => DateUtil::getDateTime()
 		]);
 
-		$config	= Form::findBySlugType( 'config-payment', CoreGlobal::TYPE_SYSTEM );
+		$config	= Form::findBySlugType( 'config-' . PaymentGlobal::TYPE_PAYMENT, CoreGlobal::TYPE_SYSTEM );
 
 		$columns = [ 'formId', 'name', 'label', 'type', 'compress', 'meta', 'active', 'validators', 'order', 'icon', 'htmlOptions' ];
 
 		$fields	= [
 			[ $config->id, 'payments', 'Payments', FormField::TYPE_TOGGLE, false, true, true, 'required', 0, NULL, '{"title":"Payments Enabled"}' ],
-			[ $config->id, 'currency', 'Currency', FormField::TYPE_SELECT, false, true, true, 'required', 0, NULL, '{"title":"Currency","items":{"USD":"USD","CAD":"CAD"}}' ],
+			[ $config->id, 'currency', 'Default Currency', FormField::TYPE_SELECT, false, true, true, 'required', 0, NULL, '{"title":"Currency","items":{"USD":"USD","CAD":"CAD"}}' ],
 		];
 
 		$this->batchInsert( $this->prefix . 'core_form_field', $columns, $fields );
@@ -91,7 +90,7 @@ class m161001_030544_payment_data extends Migration {
 
 		$metas	= [
 			[ $this->site->id, 'payments', 'Payments', 'payment', 1, 'flag', '0', NULL ],
-			[ $this->site->id, 'currency','Currency', 'payment', 1, 'text', 'USD', NULL ]
+			[ $this->site->id, 'currency', 'Default Currency', 'payment', 1, 'text', 'USD', NULL ]
 		];
 
 		$this->batchInsert( $this->prefix . 'core_site_meta', $columns, $metas );

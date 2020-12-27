@@ -9,9 +9,12 @@
 
 namespace cmsgears\payment\common\services\resources;
 
-// CMG Imports
+// Yii Imports
 use Yii;
 use yii\data\Sort;
+use yii\helpers\ArrayHelper;
+
+// CMG Imports
 use cmsgears\payment\common\config\PaymentGlobal;
 
 use cmsgears\payment\common\models\resources\Transaction;
@@ -183,12 +186,19 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 
 		// Params
 		$status	= Yii::$app->request->getQueryParam( 'status' );
+		$mode	= Yii::$app->request->getQueryParam( 'mode' );
 		$filter	= Yii::$app->request->getQueryParam( 'model' );
 
 		// Filter - Status
-		if( isset( $status ) && isset( $modelClass::$urlRevStatusMap[ $status ] ) ) {
+		if( isset( $status ) && empty( $config[ 'conditions' ][ "$modelTable.status" ] ) && isset( $modelClass::$urlRevStatusMap[ $status ] ) ) {
 
-			$config[ 'conditions' ][ "$modelTable.status" ]	= $modelClass::$urlRevStatusMap[ $status ];
+			$config[ 'conditions' ][ "$modelTable.status" ] = $modelClass::$urlRevStatusMap[ $status ];
+		}
+
+		// Filter - Mode
+		if( isset( $mode ) && empty( $config[ 'conditions' ][ "$modelTable.mode" ] ) && isset( $modelClass::$urlRevModeMap[ $mode ] ) ) {
+
+			$config[ 'conditions' ][ "$modelTable.mode" ] = $modelClass::$urlRevModeMap[ $mode ];
 		}
 
 		// Filter - Model
@@ -234,7 +244,10 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 
 		$config[ 'report-col' ]	= [
 			'title' => "$modelTable.title",
-			'desc' => "$modelTable.description"
+			'desc' => "$modelTable.description",
+			'type' => "$modelTable.type",
+			'status' => "$modelTable.status",
+			'mode' => "$modelTable.mode"
 		];
 
 		// Result -----------
@@ -269,61 +282,49 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 		$desc			= isset( $params[ 'description' ] ) ? $params[ 'description' ] : null;
 		$code			= isset( $params[ 'code' ] ) ? $params[ 'code' ] : null;
 		$processedAt	= isset( $params[ 'processedAt' ] ) ? $params[ 'processedAt' ] : null;
- 		//$data			= isset( $params[ 'data' ] ) ? $params[ 'data' ] : null;
-
-		$transaction	= isset( $config[ 'transaction' ] ) ? $config[ 'transaction' ] : new Transaction();
  		$link			= isset( $params[ 'link' ] ) ? $params[ 'link' ] : null;
  		$userId			= isset( $params[ 'userId' ] ) ? $params[ 'userId' ] : null;
 
-		// This condition is applies when we detach authorBehavior from transaction model, so in this case we need to set createdBy manually
-		if( isset( $params[ 'createdBy' ] ) ) {
-
-			$transaction->createdBy	= $params[ 'createdBy' ];
-		}
-
-		$modelClass	= new static::$modelClass;
-
-		$ignoreSite	= $config[ 'ignoreSite' ] ?? false;
-
-		if( $modelClass::isMultiSite() && !$ignoreSite ) {
-
-			$transaction->siteId = $config[ 'siteId' ] ?? Yii::$app->core->getSiteId();
-		}
+		$model = isset( $config[ 'model' ] ) ? $config[ 'model' ] : new static::$modelClass;
 
 		// Mandatory
-		$transaction->parentId		= $params[ 'parentId' ];
-		$transaction->parentType	= $params[ 'parentType' ];
-		$transaction->status		= $status;
-		$transaction->type			= $params[ 'type' ];
-		$transaction->mode			= $params[ 'mode' ];
-		$transaction->amount		= $params[ 'amount' ];
-		$transaction->currency		= $params[ 'currency' ];
-		$transaction->title			= $params[ 'title' ];
+		$model->parentId	= $params[ 'parentId' ];
+		$model->parentType	= $params[ 'parentType' ];
+		$model->status		= $status;
+		$model->type		= $params[ 'type' ];
+		$model->mode		= $params[ 'mode' ];
+		$model->amount		= $params[ 'amount' ];
+		$model->currency	= $params[ 'currency' ];
+		$model->title		= $params[ 'title' ];
 
 		// Optional
-		$transaction->description	= $desc;
-		$transaction->code			= $code;
-		$transaction->processedAt	= $processedAt;
-		//$transaction->data			= $data;
-		$transaction->link			= $link;
-		$transaction->userId		= $userId;
+		$model->description	= $desc;
+		$model->code		= $code;
+		$model->processedAt	= $processedAt;
+		$model->link		= $link;
+		$model->userId		= $userId;
 
-		$transaction->save();
+		$model->save();
 
 		// Return Transaction
-		return $transaction;
+		return $model;
 	}
 
 	// Update -------------
 
 	public function update( $model, $config = [] ) {
 
-		$admin		= isset( $config[ 'admin' ] ) ? $config[ 'admin' ] : false;
-		$attributes	= isset( $config[ 'attributes' ] ) ? $config[ 'attributes' ] : [ 'title', 'description', 'mode', 'code', 'service', 'link' ];
+		$admin = isset( $config[ 'admin' ] ) ? $config[ 'admin' ] : false;
+
+		$attributes	= isset( $config[ 'attributes' ] ) ? $config[ 'attributes' ] : [
+			'title', 'description', 'mode', 'code', 'service', 'link'
+		];
 
 		if( $admin ) {
 
-			$attributes	= [ 'title', 'description', 'mode', 'code', 'service', 'link', 'type', 'status' ];
+			$attributes	= ArrayHelper::merge( $attributes, [
+				'type', 'status'
+			]);
 		}
 
 		return parent::update( $model, [

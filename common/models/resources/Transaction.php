@@ -22,6 +22,7 @@ use cmsgears\payment\common\config\PaymentGlobal;
 use cmsgears\payment\common\models\base\PaymentTables;
 
 use cmsgears\core\common\models\interfaces\base\IAuthor;
+use cmsgears\core\common\models\interfaces\base\IMultiSite;
 use cmsgears\core\common\models\interfaces\resources\IData;
 use cmsgears\core\common\models\interfaces\resources\IGridCache;
 use cmsgears\core\common\models\interfaces\mappers\IFile;
@@ -68,7 +69,8 @@ use cmsgears\core\common\behaviors\AuthorBehavior;
  *
  * @since 1.0.0
  */
-class Transaction extends \cmsgears\core\common\models\base\ModelResource implements IAuthor, IData, IFile, IGridCache {
+class Transaction extends \cmsgears\core\common\models\base\ModelResource implements IAuthor,
+	IData, IFile, IGridCache, IMultiSite {
 
 	// Variables ---------------------------------------------------
 
@@ -78,25 +80,25 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 
 	// Transaction Modes
 
-	const MODE_OFFLINE		=   0;	// Direct - In hand or some other means
-	const MODE_FREE 		= 100; 	// Free
+	const MODE_OFFLINE	=   0;	// Direct - In hand or some other means
+	const MODE_FREE 	= 100; 	// Free
 
-	const MODE_ONLINE 		= 200; 	// Online - Net Banking
-	const MODE_CARD			= 300;	// Any card
-	const MODE_DEBIT_C		= 400;	// Specific for Debit Cards
-	const MODE_CREDIT_C		= 500;	// Specific for Credit Cards
+	const MODE_ONLINE 	= 200; 	// Online - Any Mode - Net Banking, Card, Debit Card, Credit Card
+	const MODE_CARD		= 300;	// Any Card
+	const MODE_DEBIT_C	= 400;	// Specific for Debit Card
+	const MODE_CREDIT_C	= 500;	// Specific for Credit Card
 
 	// Special offline
-	const MODE_CHEQUE		= 600;
-	const MODE_DRAFT		= 700;
+	const MODE_CHEQUE	= 600;
+	const MODE_DRAFT	= 700;
 
 	// Direct Transfers
-	const MODE_WIRE			= 800;	// Wired
+	const MODE_WIRE		= 800;	// Wired
 
 	// Transaction Types
 
-	const TYPE_CREDIT		=  0;
-	const TYPE_DEBIT		= 10;
+	const TYPE_CREDIT	=  0;
+	const TYPE_DEBIT	= 10;
 
 	// Transaction Status
 
@@ -119,6 +121,17 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 		self::MODE_CREDIT_C => 'Credit Card',
 		self::MODE_CHEQUE => 'Cheque',
 		self::MODE_DRAFT => 'Draft'
+	];
+
+	public static $urlRevModeMap = [
+		'offline' => self::MODE_OFFLINE,
+		'free' => self::MODE_FREE,
+		'online' => self::MODE_ONLINE,
+		'card' => self::MODE_CARD,
+		'dcard' => self::MODE_DEBIT_C,
+		'card' => self::MODE_CREDIT_C,
+		'cheque' => self::MODE_CHEQUE,
+		'draft' => self::MODE_DRAFT
 	];
 
 	public static $typeMap = [
@@ -205,18 +218,19 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 		$rules = [
 			// Required, Safe
 			[ [ 'parentId', 'parentType', 'type', 'amount' ], 'required' ],
-			[ [ 'id', 'content', 'data', 'gridCache', 'siteId', 'service', 'userId' ], 'safe' ],
+			[ [ 'id', 'content' ], 'safe' ],
 			// Text Limit
 			[ 'currency', 'string', 'min' => 1, 'max' => Yii::$app->core->smallText ],
 			[ [ 'parentType', 'code', 'service' ], 'string', 'min' => 1, 'max' => Yii::$app->core->mediumText ],
 			[ 'title', 'string', 'min' => 1, 'max' => Yii::$app->core->xxLargeText ],
 			[ 'link', 'string', 'min' => 0, 'max' => Yii::$app->core->xxxLargeText ],
 			[ 'description', 'string', 'min' => 0, 'max' => Yii::$app->core->xtraLargeText ],
-			[ 'refund', 'boolean' ],
 			// Other
+			[ [ 'refund', 'gridCacheValid' ], 'boolean' ],
 			[ 'amount', 'number', 'min' => 0 ],
 			[ [ 'type', 'mode', 'status' ], 'number', 'integerOnly' => true, 'min' => 0 ],
-			[ [ 'siteId', 'userId', 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ]
+			[ [ 'siteId', 'userId', 'parentId', 'createdBy', 'modifiedBy' ], 'number', 'integerOnly' => true, 'min' => 1 ],
+			[ [ 'createdAt', 'modifiedAt', 'processedAt', 'gridCachedAt' ], 'date', 'format' => Yii::$app->formatter->datetimeFormat ]
 		];
 
 		// Trim Text
@@ -349,11 +363,21 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 		return $this->status == self::STATUS_SUCCESS;
 	}
 
+	/**
+	 * Check whether transaction is credit.
+	 *
+	 * @return boolean
+	 */
 	public function isCredit() {
 
 		return $this->type == self::TYPE_CREDIT;
 	}
 
+	/**
+	 * Check whether transaction is debit.
+	 *
+	 * @return boolean
+	 */
 	public function isDebit() {
 
 		return $this->type == self::TYPE_DEBIT;
@@ -362,6 +386,16 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 	public function getStatusStr() {
 
 		return self::$statusMap[ $this->status ];
+	}
+
+	public function getTypeStr() {
+
+		return self::$typeMap[ $this->type ];
+	}
+
+	public function getModeStr() {
+
+		return self::$modeMap[ $this->mode ];
 	}
 
 	// Static Methods ----------------------------------------------
@@ -383,6 +417,18 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 	// Transaction ---------------------------
 
 	// Read - Query -----------
+
+	/**
+	 * @inheritdoc
+	 */
+	public static function queryWithHasOne( $config = [] ) {
+
+		$relations = isset( $config[ 'relations' ] ) ? $config[ 'relations' ] : [ 'user' ];
+
+		$config[ 'relations' ] = $relations;
+
+		return parent::queryWithAll( $config );
+	}
 
 	public static function queryByUserId( $userId ) {
 

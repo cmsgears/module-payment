@@ -12,17 +12,15 @@ namespace cmsgears\payment\common\config;
 // CMG Imports
 use cmsgears\payment\common\config\PaymentGlobal;
 
-use cmsgears\core\common\config\Properties;
-
-class PaymentProperties extends Properties {
+class PaymentProperties extends \cmsgears\core\common\config\Properties {
 
 	// Variables ---------------------------------------------------
 
 	// Globals ----------------
 
-	const PROP_PAYMENTS		= 'payments';
+	const PROP_PAYMENTS = 'payments';
 
-    const PROP_CURRENCY		= 'currency';
+    const PROP_CURRENCY = 'currency';
 
 	// Public -----------------
 
@@ -79,7 +77,7 @@ class PaymentProperties extends Properties {
 	 *
 	 * @return string
 	 */
-	public function getCurrency() {
+	public function getDefaultCurrency() {
 
 		return $this->properties[ self::PROP_CURRENCY ];
 	}

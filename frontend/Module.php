@@ -1,7 +1,13 @@
 <?php
-namespace cmsgears\payment\frontend;
+/**
+ * This file is part of CMSGears Framework. Please view License file distributed
+ * with the source code for license details.
+ *
+ * @link https://www.cmsgears.org/
+ * @copyright Copyright (c) 2015 VulpineCode Technologies Pvt. Ltd.
+ */
 
-// CMG Imports
+namespace cmsgears\payment\frontend;
 
 class Module extends \cmsgears\core\common\base\Module {
 

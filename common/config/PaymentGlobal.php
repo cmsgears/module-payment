@@ -24,7 +24,7 @@ class PaymentGlobal {
 
 	// Config ----------------------------------------------------------
 
-	const CONFIG_PAYMENT	= 'payment';
+	const CONFIG_PAYMENT = 'payment';
 
 	// Roles -----------------------------------------------------------
 
@@ -49,6 +49,6 @@ class PaymentGlobal {
 	const FIELD_TXN_TYPE	= 'txnTypeField';
 	const FIELD_TXN_MODE	= 'txnModeField';
 
-	const FIELD_REFUND		= 'refundField';
+	const FIELD_REFUND = 'refundField';
 
 }
