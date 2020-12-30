@@ -77,8 +77,9 @@ class m161001_030544_payment_data extends \cmsgears\core\common\base\Migration {
 		$columns = [ 'formId', 'name', 'label', 'type', 'compress', 'meta', 'active', 'validators', 'order', 'icon', 'htmlOptions' ];
 
 		$fields	= [
-			[ $config->id, 'payments', 'Payments', FormField::TYPE_TOGGLE, false, true, true, 'required', 0, NULL, '{"title":"Payments Enabled"}' ],
-			[ $config->id, 'currency', 'Default Currency', FormField::TYPE_SELECT, false, true, true, 'required', 0, NULL, '{"title":"Currency","items":{"USD":"USD","CAD":"CAD"}}' ],
+			[ $config->id, 'active', 'Active', FormField::TYPE_TOGGLE, false, true, true, 'required', 0, NULL, '{"title":"Enable/disable Payment"}' ],
+			[ $config->id, 'currencies', 'Currencies', FormField::TYPE_TEXT, false, true, true, 'required', 0, NULL, '{"title":"Currencies"}' ],
+			[ $config->id, 'currency', 'Default Currency', FormField::TYPE_SELECT, false, true, true, 'required', 0, NULL, '{"title":"Currency","items":{"USD":"USD"}}' ],
 		];
 
 		$this->batchInsert( $this->prefix . 'core_form_field', $columns, $fields );
@@ -88,8 +89,9 @@ class m161001_030544_payment_data extends \cmsgears\core\common\base\Migration {
 
 		$columns = [ 'modelId', 'name', 'label', 'type', 'active', 'valueType', 'value', 'data' ];
 
-		$metas	= [
-			[ $this->site->id, 'payments', 'Payments', 'payment', 1, 'flag', '0', NULL ],
+		$metas = [
+			[ $this->site->id, 'active', 'Active', 'payment', 1, 'flag', '1', NULL ],
+			[ $this->site->id, 'currencies', 'Currencies', 'payment', 1, 'text', 'USD', NULL ],
 			[ $this->site->id, 'currency', 'Default Currency', 'payment', 1, 'text', 'USD', NULL ]
 		];
 

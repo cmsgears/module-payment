@@ -18,8 +18,19 @@ class PaymentProperties extends \cmsgears\core\common\config\Properties {
 
 	// Globals ----------------
 
-	const PROP_PAYMENTS = 'payments';
+	/**
+	 * The property to find whether payments are enabled for the site.
+	 */
+	const PROP_ACTIVE = 'active';
 
+	/**
+	 * The property currencies in CSV format to store the available currencies.
+	 */
+	const PROP_CURRENCIES = 'currencies';
+
+	/**
+	 * The default currency among the currencies.
+	 */
     const PROP_CURRENCY = 'currency';
 
 	// Public -----------------
@@ -67,9 +78,17 @@ class PaymentProperties extends \cmsgears\core\common\config\Properties {
 	 *
 	 * @return boolean
 	 */
-	public function isPayments() {
+	public function isActive() {
 
-		return $this->properties[ self::PROP_PAYMENTS ];
+		return $this->properties[ self::PROP_ACTIVE ];
+	}
+
+	/**
+	 * Returns the currencies CSV.
+	 */
+	public function getCurrencies() {
+
+		return $this->properties[ self::PROP_CURRENCIES ];
 	}
 
 	/**
