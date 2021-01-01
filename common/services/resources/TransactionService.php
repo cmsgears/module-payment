@@ -233,21 +233,19 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 
 		if( isset( $searchCol ) ) {
 
-			$config[ 'search-col' ] = $search[ $searchCol ];
+			$config[ 'search-col' ] = $config[ 'search-col' ] ?? $search[ $searchCol ];
 		}
 		else if( isset( $keywordsCol ) ) {
 
-			$config[ 'search-col' ] = $search;
+			$config[ 'search-col' ] = $config[ 'search-col' ] ?? $search;
 		}
 
 		// Reporting --------
 
-		$config[ 'report-col' ]	= [
+		$config[ 'report-col' ]	= $config[ 'report-col' ] ?? [
 			'title' => "$modelTable.title",
 			'desc' => "$modelTable.description",
-			'type' => "$modelTable.type",
-			'status' => "$modelTable.status",
-			'mode' => "$modelTable.mode"
+			'content' => "$modelTable.content"
 		];
 
 		// Result -----------

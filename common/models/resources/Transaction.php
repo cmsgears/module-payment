@@ -159,6 +159,16 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 		'success' => self::STATUS_SUCCESS
 	];
 
+	public static $filterStatusMap = [
+		'new' => 'New',
+		'cancelled' => 'Cancelled',
+		'failed' => 'Failed',
+		'pending' => 'Pending',
+		'declined' => 'Declined',
+		'rejected' => 'Rejected',
+		'success' => 'Success'
+	];
+
 	// Protected --------------
 
 	// Variables -----------------------------
