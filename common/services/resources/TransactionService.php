@@ -116,6 +116,12 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 					'default' => SORT_DESC,
 					'label' => 'Type'
 				],
+				'code' => [
+					'asc' => [ "$modelTable.code" => SORT_ASC ],
+					'desc' => [ "$modelTable.code" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Code'
+				],
 				'mode' => [
 					'asc' => [ "$modelTable.mode" => SORT_ASC ],
 					'desc' => [ "$modelTable.mode" => SORT_DESC ],
@@ -228,7 +234,11 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 
 		$search = [
 			'title' => "$modelTable.title",
-			'desc' => "$modelTable.description"
+			'desc' => "$modelTable.description",
+			'content' => "$modelTable.content",
+			'code' => "$modelTable.code",
+			'mode' => "$modelTable.mode",
+			'service' => "$modelTable.service"
 		];
 
 		if( isset( $searchCol ) ) {
@@ -245,7 +255,12 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 		$config[ 'report-col' ]	= $config[ 'report-col' ] ?? [
 			'title' => "$modelTable.title",
 			'desc' => "$modelTable.description",
-			'content' => "$modelTable.content"
+			'content' => "$modelTable.content",
+			'status' => "$modelTable.status",
+			'type' => "$modelTable.type",
+			'code' => "$modelTable.code",
+			'mode' => "$modelTable.mode",
+			'service' => "$modelTable.service"
 		];
 
 		// Result -----------
@@ -315,7 +330,8 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 		$admin = isset( $config[ 'admin' ] ) ? $config[ 'admin' ] : false;
 
 		$attributes	= isset( $config[ 'attributes' ] ) ? $config[ 'attributes' ] : [
-			'title', 'description', 'mode', 'code', 'service', 'link'
+			'title', 'description', 'mode', 'code',
+			'amount', 'currency', 'service', 'link'
 		];
 
 		if( $admin ) {
@@ -365,11 +381,6 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 	}
 
 	public function success( $model, $config = [] ) {
-
-		return $this->updateStatus( $model, Transaction::STATUS_SUCCESS );
-	}
-
-	public function approve( $model, $config = [] ) {
 
 		return $this->updateStatus( $model, Transaction::STATUS_SUCCESS );
 	}
@@ -441,12 +452,6 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 					case 'success': {
 
 						$this->success( $model );
-
-						break;
-					}
-					case 'approve': {
-
-						$this->approve( $model );
 
 						break;
 					}

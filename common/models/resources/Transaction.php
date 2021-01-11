@@ -120,7 +120,8 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 		self::MODE_DEBIT_C => 'Debit Card',
 		self::MODE_CREDIT_C => 'Credit Card',
 		self::MODE_CHEQUE => 'Cheque',
-		self::MODE_DRAFT => 'Draft'
+		self::MODE_DRAFT => 'Draft',
+		self::MODE_WIRE => 'Wire'
 	];
 
 	public static $urlRevModeMap = [
@@ -129,14 +130,37 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 		'online' => self::MODE_ONLINE,
 		'card' => self::MODE_CARD,
 		'dcard' => self::MODE_DEBIT_C,
-		'card' => self::MODE_CREDIT_C,
+		'ccard' => self::MODE_CREDIT_C,
 		'cheque' => self::MODE_CHEQUE,
-		'draft' => self::MODE_DRAFT
+		'draft' => self::MODE_DRAFT,
+		'wire' => self::MODE_WIRE
+	];
+
+	public static $filterModeMap = [
+		'offline' => 'Offline',
+		'free' => 'Free',
+		'online' => 'Online',
+		'card' => 'Card',
+		'dcard' => 'Debit Card',
+		'ccard' => 'Credit Card',
+		'cheque' => 'Cheque',
+		'draft' => 'Draft',
+		'wire' => 'Wire'
 	];
 
 	public static $typeMap = [
 		self::TYPE_CREDIT => 'Credit',
 		self::TYPE_DEBIT => 'Debit'
+	];
+
+	public static $urlRevTypeMap = [
+		'credit' => self::TYPE_CREDIT,
+		'debit' => self::TYPE_DEBIT
+	];
+
+	public static $filterTypeMap = [
+		'credit' => 'Credit',
+		'debit' => 'Debit'
 	];
 
 	public static $statusMap = [
@@ -267,7 +291,7 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 			'description' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DESCRIPTION ),
 			'type' => Yii::$app->paymentMessage->getMessage( PaymentGlobal::FIELD_TXN_TYPE ),
 			'mode' => Yii::$app->paymentMessage->getMessage( PaymentGlobal::FIELD_TXN_MODE ),
-			'refund' => Yii::$app->paymentMessage->getMessage( PaymentGlobal::FIELD_TXN_MODE ),
+			'refund' => Yii::$app->paymentMessage->getMessage( PaymentGlobal::FIELD_REFUND ),
 			'code' => Yii::$app->paymentMessage->getMessage( PaymentGlobal::FIELD_TXN_CODE ),
 			'service' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_SERVICE ),
 			'status' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_STATUS ),

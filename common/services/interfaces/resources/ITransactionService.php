@@ -51,8 +51,6 @@ interface ITransactionService extends IModelResourceService {
 
 	public function success( $model, $config = [] );
 
-	public function approve( $model, $config = [] );
-
 	// Delete -------------
 
 	// Bulk ---------------
