@@ -61,7 +61,7 @@ class m161001_030544_payment_data extends \cmsgears\core\common\base\Migration {
 		$this->insert( $this->prefix . 'core_form', [
 			'siteId' => $this->site->id,
 			'createdBy' => $this->master->id, 'modifiedBy' => $this->master->id,
-			'name' => 'Config Payment', 'slug' => 'config-' . PaymentGlobal::TYPE_PAYMENT,
+			'name' => 'Config Payment', 'slug' => 'config-' . PaymentGlobal::CONFIG_PAYMENT,
 			'type' => CoreGlobal::TYPE_SYSTEM,
 			'description' => 'Payment configuration form.',
 			'success' => 'All configurations saved successfully.',
@@ -72,7 +72,7 @@ class m161001_030544_payment_data extends \cmsgears\core\common\base\Migration {
 			'modifiedAt' => DateUtil::getDateTime()
 		]);
 
-		$config	= Form::findBySlugType( 'config-' . PaymentGlobal::TYPE_PAYMENT, CoreGlobal::TYPE_SYSTEM );
+		$config	= Form::findBySlugType( 'config-' . PaymentGlobal::CONFIG_PAYMENT, CoreGlobal::TYPE_SYSTEM );
 
 		$columns = [ 'formId', 'name', 'label', 'type', 'compress', 'meta', 'active', 'validators', 'order', 'icon', 'htmlOptions' ];
 
@@ -90,9 +90,9 @@ class m161001_030544_payment_data extends \cmsgears\core\common\base\Migration {
 		$columns = [ 'modelId', 'name', 'label', 'type', 'active', 'valueType', 'value', 'data' ];
 
 		$metas = [
-			[ $this->site->id, 'active', 'Active', 'payment', 1, 'flag', '1', NULL ],
-			[ $this->site->id, 'currencies', 'Currencies', 'payment', 1, 'text', 'USD', NULL ],
-			[ $this->site->id, 'currency', 'Default Currency', 'payment', 1, 'text', 'USD', NULL ]
+			[ $this->site->id, 'active', 'Active', PaymentGlobal::CONFIG_PAYMENT, 1, 'flag', '1', NULL ],
+			[ $this->site->id, 'currencies', 'Currencies', PaymentGlobal::CONFIG_PAYMENT, 1, 'text', 'USD', NULL ],
+			[ $this->site->id, 'currency', 'Default Currency', PaymentGlobal::CONFIG_PAYMENT, 1, 'text', 'USD', NULL ]
 		];
 
 		$this->batchInsert( $this->prefix . 'core_site_meta', $columns, $metas );
