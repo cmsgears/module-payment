@@ -23,6 +23,7 @@ use cmsgears\payment\common\models\base\PaymentTables;
 
 use cmsgears\core\common\models\interfaces\base\IAuthor;
 use cmsgears\core\common\models\interfaces\base\IMultiSite;
+use cmsgears\core\common\models\interfaces\base\IOwner;
 use cmsgears\core\common\models\interfaces\resources\IData;
 use cmsgears\core\common\models\interfaces\resources\IGridCache;
 use cmsgears\core\common\models\interfaces\mappers\IFile;
@@ -30,10 +31,11 @@ use cmsgears\core\common\models\interfaces\mappers\IFile;
 use cmsgears\core\common\models\entities\User;
 
 use cmsgears\core\common\models\traits\base\AuthorTrait;
+use cmsgears\core\common\models\traits\base\MultiSiteTrait;
+use cmsgears\core\common\models\traits\base\OwnerTrait;
 use cmsgears\core\common\models\traits\resources\DataTrait;
 use cmsgears\core\common\models\traits\resources\GridCacheTrait;
 use cmsgears\core\common\models\traits\mappers\FileTrait;
-use cmsgears\core\common\models\traits\base\MultiSiteTrait;
 
 use cmsgears\core\common\behaviors\AuthorBehavior;
 
@@ -70,7 +72,7 @@ use cmsgears\core\common\behaviors\AuthorBehavior;
  * @since 1.0.0
  */
 class Transaction extends \cmsgears\core\common\models\base\ModelResource implements IAuthor,
-	IData, IFile, IGridCache, IMultiSite {
+	IData, IFile, IGridCache, IMultiSite, IOwner {
 
 	// Variables ---------------------------------------------------
 
@@ -212,6 +214,7 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 	use FileTrait;
 	use GridCacheTrait;
 	use MultiSiteTrait;
+	use OwnerTrait;
 
 	// Constructor and Initialisation ------------------------------
 
@@ -304,6 +307,27 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 		];
 	}
 
+	// yii\db\BaseActiveRecord
+
+	/**
+	 * @inheritdoc
+	 */
+	public function beforeSave( $insert ) {
+
+		if( parent::beforeSave( $insert ) ) {
+
+			// Default User
+			if( empty( $this->userId ) || $this->userId <= 0 ) {
+
+				$this->userId = null;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
 	// CMG interfaces ------------------------
 
 	// CMG parent classes --------------------
@@ -312,7 +336,12 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 
 	// Transaction ---------------------------
 
-	public function getUser(){
+	/**
+	 * Returns the corresponding user.
+	 *
+	 * @return \cmsgears\core\common\models\entities\User
+	 */
+	public function getUser() {
 
 		return $this->hasOne( User::class, [ 'id' => 'userId' ] );
 	}
