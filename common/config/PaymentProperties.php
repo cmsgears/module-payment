@@ -12,17 +12,26 @@ namespace cmsgears\payment\common\config;
 // CMG Imports
 use cmsgears\payment\common\config\PaymentGlobal;
 
-use cmsgears\core\common\config\Properties;
-
-class PaymentProperties extends Properties {
+class PaymentProperties extends \cmsgears\core\common\config\Properties {
 
 	// Variables ---------------------------------------------------
 
 	// Globals ----------------
 
-	const PROP_PAYMENTS		= 'payments';
+	/**
+	 * The property to find whether payments are enabled for the site.
+	 */
+	const PROP_ACTIVE = 'active';
 
-    const PROP_CURRENCY		= 'currency';
+	/**
+	 * The property currencies in CSV format to store the available currencies.
+	 */
+	const PROP_CURRENCIES = 'currencies';
+
+	/**
+	 * The default currency among the currencies.
+	 */
+    const PROP_CURRENCY = 'currency';
 
 	// Public -----------------
 
@@ -69,9 +78,17 @@ class PaymentProperties extends Properties {
 	 *
 	 * @return boolean
 	 */
-	public function isPayments() {
+	public function isActive() {
 
-		return $this->properties[ self::PROP_PAYMENTS ];
+		return $this->properties[ self::PROP_ACTIVE ];
+	}
+
+	/**
+	 * Returns the currencies CSV.
+	 */
+	public function getCurrencies() {
+
+		return $this->properties[ self::PROP_CURRENCIES ];
 	}
 
 	/**
@@ -79,7 +96,7 @@ class PaymentProperties extends Properties {
 	 *
 	 * @return string
 	 */
-	public function getCurrency() {
+	public function getDefaultCurrency() {
 
 		return $this->properties[ self::PROP_CURRENCY ];
 	}

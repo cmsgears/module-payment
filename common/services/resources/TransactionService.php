@@ -9,17 +9,20 @@
 
 namespace cmsgears\payment\common\services\resources;
 
-// CMG Imports
+// Yii Imports
 use Yii;
 use yii\data\Sort;
+use yii\helpers\ArrayHelper;
+
+// CMG Imports
 use cmsgears\payment\common\config\PaymentGlobal;
 
 use cmsgears\payment\common\models\resources\Transaction;
 
+use cmsgears\core\common\services\interfaces\resources\IFileService;
 use cmsgears\payment\common\services\interfaces\resources\ITransactionService;
 
-use cmsgears\core\common\services\base\ResourceService;
-
+use cmsgears\core\common\services\traits\cache\GridCacheTrait;
 use cmsgears\core\common\services\traits\resources\DataTrait;
 
 /**
@@ -27,7 +30,7 @@ use cmsgears\core\common\services\traits\resources\DataTrait;
  *
  * @since 1.0.0
  */
-class TransactionService extends ResourceService implements ITransactionService {
+class TransactionService extends \cmsgears\core\common\services\base\ModelResourceService implements ITransactionService {
 
 	// Variables ---------------------------------------------------
 
@@ -37,9 +40,9 @@ class TransactionService extends ResourceService implements ITransactionService 
 
 	// Public -----------------
 
-	public static $modelClass	= '\cmsgears\payment\common\models\resources\Transaction';
+	public static $modelClass = '\cmsgears\payment\common\models\resources\Transaction';
 
-	public static $parentType	= PaymentGlobal::TYPE_TRANSACTION;
+	public static $parentType = PaymentGlobal::TYPE_TRANSACTION;
 
 	// Protected --------------
 
@@ -49,13 +52,23 @@ class TransactionService extends ResourceService implements ITransactionService 
 
 	// Protected --------------
 
+	protected $fileService;
+
 	// Private ----------------
 
 	// Traits ------------------------------------------------------
 
 	use DataTrait;
+	use GridCacheTrait;
 
 	// Constructor and Initialisation ------------------------------
+
+	public function __construct( IFileService $fileService, $config = [] ) {
+
+		$this->fileService = $fileService;
+
+		parent::__construct( $config );
+	}
 
 	// Instance methods --------------------------------------------
 
@@ -72,6 +85,11 @@ class TransactionService extends ResourceService implements ITransactionService 
 	// Data Provider ------
 
 	public function getPage( $config = [] ) {
+
+		$searchParam	= $config[ 'search-param' ] ?? 'keywords';
+		$searchColParam	= $config[ 'search-col-param' ] ?? 'search';
+
+		$defaultSort = isset( $config[ 'defaultSort' ] ) ? $config[ 'defaultSort' ] : [ 'id' => SORT_DESC ];
 
 		$modelClass	= static::$modelClass;
 		$modelTable	= $this->getModelTable();
@@ -98,6 +116,12 @@ class TransactionService extends ResourceService implements ITransactionService 
 					'default' => SORT_DESC,
 					'label' => 'Type'
 				],
+				'code' => [
+					'asc' => [ "$modelTable.code" => SORT_ASC ],
+					'desc' => [ "$modelTable.code" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Code'
+				],
 				'mode' => [
 					'asc' => [ "$modelTable.mode" => SORT_ASC ],
 					'desc' => [ "$modelTable.mode" => SORT_DESC ],
@@ -122,6 +146,12 @@ class TransactionService extends ResourceService implements ITransactionService 
 					'default' => SORT_DESC,
 					'label' => 'Currency'
 				],
+				'status' => [
+					'asc' => [ "$modelTable.status" => SORT_ASC ],
+					'desc' => [ "$modelTable.status" => SORT_DESC ],
+					'default' => SORT_DESC,
+					'label' => 'Status'
+				],
 				'cdate' => [
 					'asc' => [ "$modelTable.createdAt" => SORT_ASC ],
 					'desc' => [ "$modelTable.createdAt" => SORT_DESC ],
@@ -141,8 +171,10 @@ class TransactionService extends ResourceService implements ITransactionService 
 					'label' => 'Processed At'
 				]
 			],
-			'defaultOrder' => [ 'cdate' => SORT_DESC ]
+			'defaultOrder' => $defaultSort
 		]);
+
+		// Sort -------------
 
 		if( !isset( $config[ 'sort' ] ) ) {
 
@@ -151,27 +183,84 @@ class TransactionService extends ResourceService implements ITransactionService 
 
 		// Query ------------
 
+		if( !isset( $config[ 'query' ] ) ) {
+
+			$config[ 'hasOne' ] = true;
+		}
+
 		// Filters ----------
+
+		// Params
+		$status	= Yii::$app->request->getQueryParam( 'status' );
+		$mode	= Yii::$app->request->getQueryParam( 'mode' );
+		$filter	= Yii::$app->request->getQueryParam( 'model' );
+
+		// Filter - Status
+		if( isset( $status ) && empty( $config[ 'conditions' ][ "$modelTable.status" ] ) && isset( $modelClass::$urlRevStatusMap[ $status ] ) ) {
+
+			$config[ 'conditions' ][ "$modelTable.status" ] = $modelClass::$urlRevStatusMap[ $status ];
+		}
+
+		// Filter - Mode
+		if( isset( $mode ) && empty( $config[ 'conditions' ][ "$modelTable.mode" ] ) && isset( $modelClass::$urlRevModeMap[ $mode ] ) ) {
+
+			$config[ 'conditions' ][ "$modelTable.mode" ] = $modelClass::$urlRevModeMap[ $mode ];
+		}
+
+		// Filter - Model
+		if( isset( $filter ) ) {
+
+			switch( $filter ) {
+
+				case 'credit': {
+
+					$config[ 'conditions' ][ "$modelTable.type" ] = $modelClass::TYPE_CREDIT;
+
+					break;
+				}
+				case 'debit': {
+
+					$config[ 'conditions' ][ "$modelTable.type" ] = $modelClass::TYPE_DEBIT;
+
+					break;
+				}
+			}
+		}
 
 		// Searching --------
 
-		$searchCol	= Yii::$app->request->getQueryParam( 'search' );
+		$searchCol		= Yii::$app->request->getQueryParam( $searchColParam );
+		$keywordsCol	= Yii::$app->request->getQueryParam( $searchParam );
+
+		$search = [
+			'title' => "$modelTable.title",
+			'desc' => "$modelTable.description",
+			'content' => "$modelTable.content",
+			'code' => "$modelTable.code",
+			'mode' => "$modelTable.mode",
+			'service' => "$modelTable.service"
+		];
 
 		if( isset( $searchCol ) ) {
 
-			$search = [
-				'title' => "$modelTable.title",
-				'desc' => "$modelTable.description"
-			];
+			$config[ 'search-col' ] = $config[ 'search-col' ] ?? $search[ $searchCol ];
+		}
+		else if( isset( $keywordsCol ) ) {
 
-			$config[ 'search-col' ] = $search[ $searchCol ];
+			$config[ 'search-col' ] = $config[ 'search-col' ] ?? $search;
 		}
 
 		// Reporting --------
 
-		$config[ 'report-col' ]	= [
+		$config[ 'report-col' ]	= $config[ 'report-col' ] ?? [
 			'title' => "$modelTable.title",
-			'desc' => "$modelTable.description"
+			'desc' => "$modelTable.description",
+			'content' => "$modelTable.content",
+			'status' => "$modelTable.status",
+			'type' => "$modelTable.type",
+			'code' => "$modelTable.code",
+			'mode' => "$modelTable.mode",
+			'service' => "$modelTable.service"
 		];
 
 		// Result -----------
@@ -179,18 +268,13 @@ class TransactionService extends ResourceService implements ITransactionService 
 		return parent::getPage( $config );
 	}
 
-	public function getPageByCreatorId( $creatorId ) {
+	public function getPageByUserId( $userId, $config = [] ) {
 
 		$modelTable = $this->getModelTable();
 
-		return $this->getPage( [ 'conditions' => [ "$modelTable.createdBy" => $creatorId ] ] );
-	}
+		$config[ 'conditions' ][] = [ "$modelTable.userId" => $userId ];
 
-	public function getPageByParent( $parentId, $parentType ) {
-
-		$modelTable = $this->getModelTable();
-
-		return $this->getPage( [ 'conditions' => [ "$modelTable.parentId" => $parentId, "$modelTable.parentType" => $parentType ] ] );
+		return $this->getPage( $config );
 	}
 
 	// Read ---------------
@@ -211,92 +295,186 @@ class TransactionService extends ResourceService implements ITransactionService 
 		$desc			= isset( $params[ 'description' ] ) ? $params[ 'description' ] : null;
 		$code			= isset( $params[ 'code' ] ) ? $params[ 'code' ] : null;
 		$processedAt	= isset( $params[ 'processedAt' ] ) ? $params[ 'processedAt' ] : null;
- 		$data			= isset( $params[ 'data' ] ) ? $params[ 'data' ] : null;
-
-		$transaction	= isset( $config[ 'transaction' ] ) ? $config[ 'transaction' ] : new Transaction();
  		$link			= isset( $params[ 'link' ] ) ? $params[ 'link' ] : null;
  		$userId			= isset( $params[ 'userId' ] ) ? $params[ 'userId' ] : null;
 
-		// This condition is applies when we detach authorBehavior from transaction model, so in this case we need to set createdBy manually
-		if( isset( $params[ 'createdBy' ] ) ) {
-
-			$transaction->createdBy	= $params[ 'createdBy' ];
-		}
-
-		$modelClass	= new static::$modelClass;
-
-		$ignoreSite	= $config[ 'ignoreSite' ] ?? false;
-
-		if( $modelClass::isMultiSite() && !$ignoreSite ) {
-
-			$transaction->siteId	= $config[ 'siteId' ] ?? Yii::$app->core->getSiteId();
-		}
+		$model = isset( $config[ 'model' ] ) ? $config[ 'model' ] : new static::$modelClass;
 
 		// Mandatory
-		$transaction->parentId		= $params[ 'parentId' ];
-		$transaction->parentType	= $params[ 'parentType' ];
-		$transaction->status		= $status;
-		$transaction->type			= $params[ 'type' ];
-		$transaction->mode			= $params[ 'mode' ];
-		$transaction->amount		= $params[ 'amount' ];
-		$transaction->currency		= $params[ 'currency' ];
-		$transaction->title			= $params[ 'title' ];
+		$model->parentId	= $params[ 'parentId' ];
+		$model->parentType	= $params[ 'parentType' ];
+		$model->status		= $status;
+		$model->type		= $params[ 'type' ];
+		$model->mode		= $params[ 'mode' ];
+		$model->amount		= $params[ 'amount' ];
+		$model->currency	= $params[ 'currency' ];
+		$model->title		= $params[ 'title' ];
 
 		// Optional
-		$transaction->description	= $desc;
-		$transaction->code			= $code;
-		$transaction->processedAt	= $processedAt;
-		$transaction->data			= $data;
-		$transaction->link			= $link;
-		$transaction->userId		= $userId;
+		$model->description	= $desc;
+		$model->code		= $code;
+		$model->processedAt	= $processedAt;
+		$model->link		= $link;
+		$model->userId		= $userId;
 
-		$transaction->save();
+		$model->save();
 
 		// Return Transaction
-		return $transaction;
+		return $model;
 	}
 
 	// Update -------------
 
 	public function update( $model, $config = [] ) {
 
+		$admin = isset( $config[ 'admin' ] ) ? $config[ 'admin' ] : false;
+
+		$attributes	= isset( $config[ 'attributes' ] ) ? $config[ 'attributes' ] : [
+			'title', 'description', 'mode', 'code',
+			'amount', 'currency', 'service', 'link'
+		];
+
+		if( $admin ) {
+
+			$attributes	= ArrayHelper::merge( $attributes, [
+				'type', 'status'
+			]);
+		}
+
 		return parent::update( $model, [
-			'attributes' => [ 'title', 'description', 'mode', 'code', 'service', 'link' ]
+			'attributes' => $attributes
 		]);
 	}
 
 	public function updateStatus( $model, $status ) {
 
-		$model->status	= $status;
+		$model->status = $status;
 
 		return parent::update( $model, [
 			'attributes' => [ 'status' ]
 		]);
 	}
 
-	public function pending( $model ) {
+	public function cancel( $model, $config = [] ) {
 
-		return $this->updateStatus( $model, Transaction::STATUS_PENDING );
+		return $this->updateStatus( $model, Transaction::STATUS_CANCELLED );
 	}
 
-	public function failed( $model ) {
+	public function fail( $model, $config = [] ) {
 
 		return $this->updateStatus( $model, Transaction::STATUS_FAILED );
 	}
 
-	public function declined( $model ) {
+	public function pending( $model, $config = [] ) {
+
+		return $this->updateStatus( $model, Transaction::STATUS_PENDING );
+	}
+
+	public function decline( $model, $config = [] ) {
 
 		return $this->updateStatus( $model, Transaction::STATUS_DECLINED );
 	}
 
-	public function success( $model ) {
+	public function reject( $model, $config = [] ) {
+
+		return $this->updateStatus( $model, Transaction::STATUS_REJECTED );
+	}
+
+	public function success( $model, $config = [] ) {
 
 		return $this->updateStatus( $model, Transaction::STATUS_SUCCESS );
 	}
 
 	// Delete -------------
 
+	public function delete( $model, $config = [] ) {
+
+		$transaction = Yii::$app->db->beginTransaction();
+
+		try {
+
+			// Delete files
+			$this->fileService->deleteFiles( [ $model->files ] );
+
+			$transaction->commit();
+		}
+		catch( Exception $e ) {
+
+			$transaction->rollBack();
+
+			throw new Exception( Yii::$app->coreMessage->getMessage( CoreGlobal::ERROR_DEPENDENCY )  );
+		}
+
+		// Delete model
+		return parent::delete( $model, $config );
+	}
+
 	// Bulk ---------------
+
+	protected function applyBulk( $model, $column, $action, $target, $config = [] ) {
+
+		switch( $column ) {
+
+			case 'status': {
+
+				switch( $action ) {
+
+					case 'cancel': {
+
+						$this->cancel( $model );
+
+						break;
+					}
+					case 'fail': {
+
+						$this->fail( $model );
+
+						break;
+					}
+					case 'pending': {
+
+						$this->pending( $model );
+
+						break;
+					}
+					case 'decline': {
+
+						$this->decline( $model );
+
+						break;
+					}
+					case 'reject': {
+
+						$this->reject( $model );
+
+						break;
+					}
+					case 'success': {
+
+						$this->success( $model );
+
+						break;
+					}
+				}
+
+				break;
+			}
+			case 'model': {
+
+				switch( $action ) {
+
+					case 'delete': {
+
+						$this->delete( $model );
+
+						break;
+					}
+				}
+
+				break;
+			}
+		}
+	}
 
 	// Notifications ------
 
@@ -327,61 +505,5 @@ class TransactionService extends ResourceService implements ITransactionService 
 	// Update -------------
 
 	// Delete -------------
-
-	protected function applyBulk( $model, $column, $action, $target, $config = [] ) {
-
-		switch( $column ) {
-
-			case 'status': {
-
-				switch( $action ) {
-
-					case 'pending': {
-
-						$this->pending( $model );
-
-						break;
-					}
-
-					case 'failed': {
-
-						$this->failed( $model );
-
-						break;
-					}
-
-					case 'declined': {
-
-						$this->declined( $model );
-
-						break;
-					}
-
-					case 'success': {
-
-						$this->success( $model );
-
-						break;
-					}
-				}
-
-				break;
-			}
-			case 'model': {
-
-				switch( $action ) {
-
-					case 'delete': {
-
-						$this->delete( $model );
-
-						break;
-					}
-				}
-
-				break;
-			}
-		}
-	}
 
 }

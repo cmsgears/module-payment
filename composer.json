@@ -1,6 +1,6 @@
 {
 	"name": "cmsgears/module-payment",
-	"description": "The Payment Module for CMSGears based projects. It's required for all the projects dealing with payments.",
+	"description": "The Payment Module provides options to manage payments/transactions.",
 	"homepage": "http://www.cmsgears.com",
 	"type": "package",
 	"keywords": [ "yii2", "cmsgears", "module", "payment" ],

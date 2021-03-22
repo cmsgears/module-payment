@@ -9,19 +9,16 @@
 
 namespace cmsgears\payment\common\models\base;
 
-// CMG Imports
-use cmsgears\core\common\models\base\DbTables;
-
 /**
  * It provide table name constants of db tables available in Payment Module.
  *
  * @since 1.0.0
  */
-class PaymentTables extends DbTables {
+class PaymentTables extends \cmsgears\core\common\models\base\DbTables {
 
 	// Entities -------------
 
-	const TABLE_TRANSACTION		= 'cmg_payment_transaction';
+	const TABLE_TRANSACTION = 'cmg_payment_transaction';
 
 	// Resources ------------
 

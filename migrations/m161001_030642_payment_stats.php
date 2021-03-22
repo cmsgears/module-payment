@@ -8,8 +8,6 @@
  */
 
 // CMG Imports
-use cmsgears\core\common\base\Migration;
-
 use cmsgears\core\common\models\resources\Stats;
 use cmsgears\payment\common\models\base\PaymentTables;
 
@@ -19,7 +17,7 @@ use cmsgears\payment\common\models\base\PaymentTables;
  *
  * @since 1.0.0
  */
-class m161001_030642_payment_stats extends Migration {
+class m161001_030642_payment_stats extends \cmsgears\core\common\base\Migration {
 
 	// Public Variables
 
@@ -32,10 +30,10 @@ class m161001_030642_payment_stats extends Migration {
 	public function init() {
 
 		// Table prefix
-		$this->prefix		= Yii::$app->migration->cmgPrefix;
+		$this->prefix = Yii::$app->migration->cmgPrefix;
 
 		// Get the values via config
-		$this->options		= Yii::$app->migration->getTableOptions();
+		$this->options = Yii::$app->migration->getTableOptions();
 
 		// Default collation
 		if( $this->db->driverName === 'mysql' ) {

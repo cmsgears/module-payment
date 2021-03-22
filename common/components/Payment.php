@@ -9,15 +9,12 @@
 
 namespace cmsgears\payment\common\components;
 
-// CMG Imports
-use cmsgears\core\common\base\Component;
-
 /**
  * Payment component initialises the Payment Module.
  *
  * @since 1.0.0
  */
-class Payment extends Component {
+class Payment extends \cmsgears\core\common\base\Component {
 
 	// Global -----------------
 
