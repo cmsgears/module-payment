@@ -69,7 +69,7 @@ class m161001_030538_payment extends \cmsgears\core\common\base\Migration {
 			'code' => $this->string( Yii::$app->core->mediumText )->defaultValue( null ),
 			'service' => $this->string( Yii::$app->core->mediumText )->defaultValue( null ),
 			'status' => $this->smallInteger( 6 )->notNull()->defaultValue( 0 ),
-			'amount' => $this->double(),
+			'amount' => $this->double()->notNull(),
 			'currency' => $this->string( Yii::$app->core->smallText )->notNull(),
 			'link' => $this->string( Yii::$app->core->xxxLargeText )->defaultValue( null ),
 			'createdAt' => $this->dateTime()->notNull(),
