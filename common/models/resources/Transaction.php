@@ -27,7 +27,6 @@ use cmsgears\core\common\models\interfaces\resources\IData;
 use cmsgears\core\common\models\interfaces\resources\IGridCache;
 use cmsgears\core\common\models\interfaces\mappers\IFile;
 
-use cmsgears\core\common\models\entities\User;
 use cmsgears\payment\common\models\base\PaymentTables;
 
 use cmsgears\core\common\models\traits\base\AuthorTrait;
@@ -341,16 +340,6 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 	// Validators ----------------------------
 
 	// Transaction ---------------------------
-
-	/**
-	 * Returns the corresponding user.
-	 *
-	 * @return \cmsgears\core\common\models\entities\User
-	 */
-	public function getUser() {
-
-		return $this->hasOne( User::class, [ 'id' => 'userId' ] );
-	}
 
 	/**
 	 * Check whether transaction is new.
