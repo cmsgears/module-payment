@@ -27,6 +27,7 @@ use cmsgears\core\common\models\interfaces\resources\IData;
 use cmsgears\core\common\models\interfaces\resources\IGridCache;
 use cmsgears\core\common\models\interfaces\mappers\IFile;
 
+use cmsgears\core\common\models\resources\File;
 use cmsgears\payment\common\models\base\PaymentTables;
 
 use cmsgears\core\common\models\traits\base\AuthorTrait;
@@ -45,6 +46,7 @@ use cmsgears\core\common\behaviors\AuthorBehavior;
  * @property integer $id
  * @property integer $siteId
  * @property integer $userId
+ * @property integer $docId
  * @property integer $createdBy
  * @property integer $modifiedBy
  * @property integer $parentId
@@ -271,7 +273,7 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 			[ [ 'refund', 'gridCacheValid' ], 'boolean' ],
 			[ 'amount', 'number', 'min' => 0 ],
 			[ [ 'type', 'mode', 'status' ], 'number', 'integerOnly' => true, 'min' => 0 ],
-			[ [ 'siteId', 'userId', 'createdBy', 'modifiedBy', 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ],
+			[ [ 'siteId', 'userId', 'docId', 'createdBy', 'modifiedBy', 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ],
 			[ [ 'createdAt', 'modifiedAt', 'processedAt', 'gridCachedAt' ], 'date', 'format' => Yii::$app->formatter->datetimeFormat ]
 		];
 
@@ -294,6 +296,7 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 		return [
 			'siteId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_SITE ),
 			'userId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_USER ),
+			'docId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DOCUMENT ),
 			'parentId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_PARENT ),
 			'title' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_TITLE ),
 			'description' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DESCRIPTION ),
@@ -340,6 +343,11 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 	// Validators ----------------------------
 
 	// Transaction ---------------------------
+
+	public function getDocument() {
+
+		return $this->hasOne( File::class, [ 'id' => 'docId' ] );
+	}
 
 	/**
 	 * Check whether transaction is new.

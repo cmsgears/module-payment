@@ -289,6 +289,17 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 
 	// Create -------------
 
+	public function create( $model, $config = [] ) {
+
+		$document = isset( $config[ 'document' ] ) ? $config[ 'document' ] : null;
+
+		// Save Files
+		$this->fileService->saveFiles( $model, [ 'docId' => $document ] );
+
+		// Create Model
+		return parent::create( $model, $config );
+	}
+
 	public function createByParams( $params = [], $config = [] ) {
 
 		$status			= isset( $params[ 'status' ] ) ? $params[ 'status' ] : Transaction::STATUS_NEW;
@@ -317,20 +328,18 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 		$model->link		= $link;
 		$model->userId		= $userId;
 
-		$model->save();
-
-		// Return Transaction
-		return $model;
+		return $this->create( $model, $config );
 	}
 
 	// Update -------------
 
 	public function update( $model, $config = [] ) {
 
-		$admin = isset( $config[ 'admin' ] ) ? $config[ 'admin' ] : false;
+		$admin		= isset( $config[ 'admin' ] ) ? $config[ 'admin' ] : false;
+		$document	= isset( $config[ 'document' ] ) ? $config[ 'document' ] : null;
 
 		$attributes	= isset( $config[ 'attributes' ] ) ? $config[ 'attributes' ] : [
-			'title', 'description', 'mode', 'code',
+			'docId', 'title', 'description', 'mode', 'code',
 			'amount', 'currency', 'service', 'link'
 		];
 
@@ -340,6 +349,9 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 				'type', 'status'
 			]);
 		}
+
+		// Save Files
+		$this->fileService->saveFiles( $model, [ 'docId' => $document ] );
 
 		return parent::update( $model, [
 			'attributes' => $attributes
@@ -385,6 +397,11 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 		return $this->updateStatus( $model, Transaction::STATUS_SUCCESS );
 	}
 
+	public function approve( $model, $config = [] ) {
+
+		return $this->updateStatus( $model, Transaction::STATUS_SUCCESS );
+	}
+
 	// Delete -------------
 
 	public function delete( $model, $config = [] ) {
@@ -394,7 +411,8 @@ class TransactionService extends \cmsgears\core\common\services\base\ModelResour
 		try {
 
 			// Delete files
-			$this->fileService->deleteFiles( [ $model->files ] );
+			$this->fileService->deleteFiles( [ $model->document ] );
+			$this->fileService->deleteFiles( $model->files );
 
 			$transaction->commit();
 		}
