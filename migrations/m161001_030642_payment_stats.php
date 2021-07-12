@@ -8,7 +8,9 @@
  */
 
 // CMG Imports
-use cmsgears\core\common\models\resources\Stats;
+use cmsgears\core\common\config\CoreGlobal;
+
+use cmsgears\core\common\models\resources\ModelStats;
 use cmsgears\payment\common\models\base\PaymentTables;
 
 /**
@@ -50,18 +52,18 @@ class m161001_030642_payment_stats extends \cmsgears\core\common\base\Migration 
 
 	private function insertTables() {
 
-		$columns 	= [ 'tableName', 'type', 'count' ];
+		$columns = [ 'parentId', 'parentType', 'name', 'type', 'count' ];
 
-		$tableData	= [
-			[ $this->prefix . 'payment_transaction', 'rows', 0 ]
+		$tableData = [
+			[ 1, CoreGlobal::TYPE_SITE, $this->prefix . 'payment_transaction', 'rows', 0 ]
 		];
 
-		$this->batchInsert( $this->prefix . 'core_stats', $columns, $tableData );
+		$this->batchInsert( $this->prefix . 'core_model_stats', $columns, $tableData );
 	}
 
 	public function down() {
 
-		Stats::deleteByTableName( PaymentTables::getTableName( PaymentTables::TABLE_TRANSACTION ) );
+		ModelStats::deleteByTable( PaymentTables::getTableName( PaymentTables::TABLE_TRANSACTION ) );
 	}
 
 }
