@@ -19,20 +19,21 @@ use yii\behaviors\TimestampBehavior;
 use cmsgears\core\common\config\CoreGlobal;
 use cmsgears\payment\common\config\PaymentGlobal;
 
-use cmsgears\payment\common\models\base\PaymentTables;
-
 use cmsgears\core\common\models\interfaces\base\IAuthor;
 use cmsgears\core\common\models\interfaces\base\IMultiSite;
 use cmsgears\core\common\models\interfaces\base\IOwner;
+use cmsgears\core\common\models\interfaces\resources\IContent;
 use cmsgears\core\common\models\interfaces\resources\IData;
 use cmsgears\core\common\models\interfaces\resources\IGridCache;
 use cmsgears\core\common\models\interfaces\mappers\IFile;
 
-use cmsgears\core\common\models\entities\User;
+use cmsgears\core\common\models\resources\File;
+use cmsgears\payment\common\models\base\PaymentTables;
 
 use cmsgears\core\common\models\traits\base\AuthorTrait;
 use cmsgears\core\common\models\traits\base\MultiSiteTrait;
 use cmsgears\core\common\models\traits\base\OwnerTrait;
+use cmsgears\core\common\models\traits\resources\ContentTrait;
 use cmsgears\core\common\models\traits\resources\DataTrait;
 use cmsgears\core\common\models\traits\resources\GridCacheTrait;
 use cmsgears\core\common\models\traits\mappers\FileTrait;
@@ -45,6 +46,7 @@ use cmsgears\core\common\behaviors\AuthorBehavior;
  * @property integer $id
  * @property integer $siteId
  * @property integer $userId
+ * @property integer $docId
  * @property integer $createdBy
  * @property integer $modifiedBy
  * @property integer $parentId
@@ -72,7 +74,7 @@ use cmsgears\core\common\behaviors\AuthorBehavior;
  * @since 1.0.0
  */
 class Transaction extends \cmsgears\core\common\models\base\ModelResource implements IAuthor,
-	IData, IFile, IGridCache, IMultiSite, IOwner {
+	IContent, IData, IFile, IGridCache, IMultiSite, IOwner {
 
 	// Variables ---------------------------------------------------
 
@@ -105,6 +107,7 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 	// Transaction Status
 
 	const STATUS_NEW		=   0;
+	const STATUS_REQUESTED	=  25;
 	const STATUS_CANCELLED	=  50;
 	const STATUS_FAILED		= 100;
 	const STATUS_PENDING	= 150;
@@ -167,6 +170,7 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 
 	public static $statusMap = [
 		self::STATUS_NEW => 'New',
+		self::STATUS_REQUESTED => 'Requested',
 		self::STATUS_CANCELLED => 'Cancelled',
 		self::STATUS_FAILED => 'Failed',
 		self::STATUS_PENDING => 'Pending',
@@ -177,6 +181,7 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 
 	public static $urlRevStatusMap = [
 		'new' => self::STATUS_NEW,
+		'requested' => self::STATUS_REQUESTED,
 		'cancelled' => self::STATUS_CANCELLED,
 		'failed' => self::STATUS_FAILED,
 		'pending' => self::STATUS_PENDING,
@@ -187,6 +192,7 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 
 	public static $filterStatusMap = [
 		'new' => 'New',
+		'requested' => 'Requested',
 		'cancelled' => 'Cancelled',
 		'failed' => 'Failed',
 		'pending' => 'Pending',
@@ -210,6 +216,7 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 	// Traits ------------------------------------------------------
 
 	use AuthorTrait;
+	use ContentTrait;
 	use DataTrait;
 	use FileTrait;
 	use GridCacheTrait;
@@ -254,7 +261,7 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 		// Model Rules
 		$rules = [
 			// Required, Safe
-			[ [ 'parentId', 'parentType', 'type', 'amount' ], 'required' ],
+			[ [ 'siteId', 'parentId', 'parentType', 'type', 'amount' ], 'required' ],
 			[ [ 'id', 'content' ], 'safe' ],
 			// Text Limit
 			[ 'currency', 'string', 'min' => 1, 'max' => Yii::$app->core->smallText ],
@@ -266,7 +273,7 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 			[ [ 'refund', 'gridCacheValid' ], 'boolean' ],
 			[ 'amount', 'number', 'min' => 0 ],
 			[ [ 'type', 'mode', 'status' ], 'number', 'integerOnly' => true, 'min' => 0 ],
-			[ [ 'siteId', 'userId', 'parentId', 'createdBy', 'modifiedBy' ], 'number', 'integerOnly' => true, 'min' => 1 ],
+			[ [ 'siteId', 'userId', 'docId', 'createdBy', 'modifiedBy', 'parentId' ], 'number', 'integerOnly' => true, 'min' => 1 ],
 			[ [ 'createdAt', 'modifiedAt', 'processedAt', 'gridCachedAt' ], 'date', 'format' => Yii::$app->formatter->datetimeFormat ]
 		];
 
@@ -289,6 +296,7 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 		return [
 			'siteId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_SITE ),
 			'userId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_USER ),
+			'docId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DOCUMENT ),
 			'parentId' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_PARENT ),
 			'title' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_TITLE ),
 			'description' => Yii::$app->coreMessage->getMessage( CoreGlobal::FIELD_DESCRIPTION ),
@@ -336,14 +344,9 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 
 	// Transaction ---------------------------
 
-	/**
-	 * Returns the corresponding user.
-	 *
-	 * @return \cmsgears\core\common\models\entities\User
-	 */
-	public function getUser() {
+	public function getDocument() {
 
-		return $this->hasOne( User::class, [ 'id' => 'userId' ] );
+		return $this->hasOne( File::class, [ 'id' => 'docId' ] );
 	}
 
 	/**
@@ -354,6 +357,16 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 	public function isNew() {
 
 		return $this->status == self::STATUS_NEW;
+	}
+
+	/**
+	 * Check whether transaction is requested.
+	 *
+	 * @return boolean
+	 */
+	public function isRequested() {
+
+		return $this->status == self::STATUS_REQUESTED;
 	}
 
 	/**
@@ -492,6 +505,13 @@ class Transaction extends \cmsgears\core\common\models\base\ModelResource implem
 
 		return parent::queryWithAll( $config );
 	}
+
+	public static function queryWithUser( $config = [] ) {
+
+        $config[ 'relations' ][] = [ 'user' ];
+
+        return parent::queryWithAll( $config );
+    }
 
 	public static function queryByUserId( $userId ) {
 
